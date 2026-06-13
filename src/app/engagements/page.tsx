@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { loadData, saveData } from '@/lib/storage';
+import { loadData, saveData, deleteRow } from '@/lib/storage';
 import { Engagement, Phase } from '@/lib/types';
 import { seedEngagements } from '@/lib/seeds';
 import { PhaseBadge } from '@/components/Badge';
@@ -21,7 +21,7 @@ export default function EngagementsPage() {
   const [editing, setEditing] = useState<Engagement | null>(null);
   const [form, setForm] = useState<Omit<Engagement, 'id'>>(emptyForm);
 
-  useEffect(() => { setEngagements(loadData('engagements', seedEngagements)); }, []);
+  useEffect(() => { loadData('engagements', seedEngagements).then(setEngagements); }, []);
 
   function openNew() { setEditing(null); setForm(emptyForm); setShowModal(true); }
   function openEdit(e: Engagement) { setEditing(e); setForm({ clientName: e.clientName, phase: e.phase, progress: e.progress, deadline: e.deadline, frameworks: e.frameworks, notes: e.notes }); setShowModal(true); }
@@ -44,7 +44,7 @@ export default function EngagementsPage() {
     if (!confirm('Remove this engagement?')) return;
     const updated = engagements.filter(e => e.id !== id);
     setEngagements(updated);
-    saveData('engagements', updated);
+    deleteRow('engagements', id);
   }
 
   function toggleFramework(fw: string) {

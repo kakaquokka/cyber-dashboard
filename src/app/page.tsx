@@ -43,11 +43,11 @@ export default function OverviewPage() {
   const [cpd, setCpd] = useState<CpdEntry[]>([]);
 
   useEffect(() => {
-    setEngagements(loadData('engagements', seedEngagements));
-    setClients(loadData('clients', seedClients));
-    setTasks(loadData('tasks', seedTasks));
-    setDeliverables(loadData('deliverables', seedDeliverables));
-    setCpd(loadData('cpd', seedCpd));
+    loadData('engagements', seedEngagements).then(setEngagements);
+    loadData('clients', seedClients).then(setClients);
+    loadData('tasks', seedTasks).then(setTasks);
+    loadData('deliverables', seedDeliverables).then(setDeliverables);
+    loadData('cpd', seedCpd).then(setCpd);
   }, []);
 
   const activeEngagements = engagements.filter(e => e.phase !== 'closed');

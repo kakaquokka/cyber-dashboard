@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { loadData, saveData } from '@/lib/storage';
+import { loadData, saveData, deleteRow } from '@/lib/storage';
 import { CpdEntry } from '@/lib/types';
 import { seedCpd } from '@/lib/seeds';
 import { format } from 'date-fns';
@@ -27,7 +27,7 @@ export default function CpdPage() {
   const [showModal, setShowModal] = useState(false);
   const [form, setForm] = useState<Omit<CpdEntry, 'id'>>(emptyForm);
 
-  useEffect(() => { setEntries(loadData('cpd', seedCpd)); }, []);
+  useEffect(() => { loadData('cpd', seedCpd).then(setEntries); }, []);
 
   const totalHours = entries.reduce((s, e) => s + e.hours, 0);
   const pct = Math.min(Math.round((totalHours / CPD_TARGET) * 100), 100);
@@ -48,7 +48,7 @@ export default function CpdPage() {
   function remove(id: string) {
     const updated = entries.filter(e => e.id !== id);
     setEntries(updated);
-    saveData('cpd', updated);
+    deleteRow('cpd', id);
   }
 
   return (

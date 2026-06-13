@@ -1,23 +1,35 @@
-export function loadData<T>(key: string, fallback: T): T {
-  if (typeof window === 'undefined') return fallback;
-  try {
-    const raw = localStorage.getItem(key);
-    return raw ? (JSON.parse(raw) as T) : fallback;
-  } catch {
-    return fallback;
-  }
+import { supabase } from './supabase';
+
+// Table names map to our data keys
+type TableName = 'engagements' | 'clients' | 'tasks' | 'deliverables' | 'cpd';
+
+export async function loadData<T>(table: TableName, fallback: T[]): Promise<T[]> {
+  const { data, error } = await supabase
+    .from(table)
+    .select('data');
+
+  if (error || !data || data.length === 0) return fallback;
+  return data.map((row: { data: T }) => row.data);
 }
 
-export function saveData<T>(key: string, data: T): void {
-  if (typeof window === 'undefined') return;
-  try {
-    localStorage.setItem(key, JSON.stringify(data));
-  } catch {
-    console.error('Failed to save data for key:', key);
-  }
+export async function saveData<T extends { id: string }>(
+  table: TableName,
+  items: T[]
+): Promise<void> {
+  // Upsert all items — insert or update based on id
+  const rows = items.map(item => ({ id: item.id, data: item }));
+  const { error } = await supabase
+    .from(table)
+    .upsert(rows, { onConflict: 'id' });
+
+  if (error) console.error(`Failed to save to ${table}:`, error);
 }
 
-export function removeData(key: string): void {
-  if (typeof window === 'undefined') return;
-  localStorage.removeItem(key);
+export async function deleteRow(table: TableName, id: string): Promise<void> {
+  const { error } = await supabase
+    .from(table)
+    .delete()
+    .eq('id', id);
+
+  if (error) console.error(`Failed to delete from ${table}:`, error);
 }

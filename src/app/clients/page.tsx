@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { loadData, saveData } from '@/lib/storage';
+import { loadData, saveData, deleteRow } from '@/lib/storage';
 import { Client, Engagement } from '@/lib/types';
 import { seedClients, seedEngagements } from '@/lib/seeds';
 
@@ -28,8 +28,8 @@ export default function ClientsPage() {
   const [search, setSearch] = useState('');
 
   useEffect(() => {
-    setClients(loadData('clients', seedClients));
-    setEngagements(loadData('engagements', seedEngagements));
+    loadData('clients', seedClients).then(setClients);
+    loadData('engagements', seedEngagements).then(setEngagements);
   }, []);
 
   const filtered = clients.filter(c =>
@@ -62,7 +62,7 @@ export default function ClientsPage() {
     if (!confirm('Remove this contact?')) return;
     const updated = clients.filter(c => c.id !== id);
     setClients(updated);
-    saveData('clients', updated);
+    deleteRow('clients', id);
   }
 
   return (

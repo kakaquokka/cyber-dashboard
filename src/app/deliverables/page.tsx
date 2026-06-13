@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { loadData, saveData } from '@/lib/storage';
+import { loadData, saveData, deleteRow } from '@/lib/storage';
 import { Deliverable, Engagement } from '@/lib/types';
 import { seedDeliverables, seedEngagements } from '@/lib/seeds';
 import { format, differenceInDays, isToday } from 'date-fns';
@@ -33,8 +33,8 @@ export default function DeliverablesPage() {
   const [filter, setFilter] = useState<'all' | 'pending' | 'done'>('all');
 
   useEffect(() => {
-    setDeliverables(loadData('deliverables', seedDeliverables));
-    setEngagements(loadData('engagements', seedEngagements));
+    loadData('deliverables', seedDeliverables).then(setDeliverables);
+    loadData('engagements', seedEngagements).then(setEngagements);
   }, []);
 
   function toggle(id: string) {
@@ -46,7 +46,7 @@ export default function DeliverablesPage() {
   function remove(id: string) {
     const updated = deliverables.filter(d => d.id !== id);
     setDeliverables(updated);
-    saveData('deliverables', updated);
+    deleteRow('deliverables', id);
   }
 
   function save() {

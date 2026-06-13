@@ -1,5 +1,5 @@
 export type Priority = 'critical' | 'high' | 'medium' | 'low';
-export type Phase = 'planning' | 'fieldwork' | 'reporting' | 'closed';
+export type Phase = 'planning' | 'assessment' | 'reporting' | 'closed';
 
 export interface Engagement {
   id: string;

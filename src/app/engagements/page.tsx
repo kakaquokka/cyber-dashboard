@@ -7,7 +7,7 @@ import { seedEngagements } from '@/lib/seeds';
 import { PhaseBadge } from '@/components/Badge';
 import { format, differenceInDays } from 'date-fns';
 
-const phases: Phase[] = ['planning', 'fieldwork', 'reporting', 'closed'];
+const phases: Phase[] = ['planning', 'assessment', 'reporting', 'closed'];
 const allFrameworks = ['ISO 27001', 'NIST CSF', 'MAS TRM', 'CIS Controls', 'CSMS', 'PCI DSS', 'SOC 2'];
 
 const emptyForm: Omit<Engagement, 'id'> = {

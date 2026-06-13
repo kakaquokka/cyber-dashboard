@@ -80,7 +80,7 @@ export default function OverviewPage() {
       {/* Metric cards */}
       <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
         {[
-          { label: 'Active engagements', value: activeEngagements.length, sub: `${engagements.filter(e => e.phase === 'fieldwork').length} in fieldwork` },
+          { label: 'Active engagements', value: activeEngagements.length, sub: `${engagements.filter(e => e.phase === 'assessment').length} in fieldwork` },
           { label: 'Open tasks', value: pendingTasks.length, sub: `${pendingTasks.filter(t => t.priority === 'critical').length} critical` },
           { label: 'Deadlines this week', value: upcomingDeadlines, sub: 'across all engagements' },
           { label: 'Deliverables done', value: `${doneDeliverables}/${deliverables.length}`, sub: `${Math.round((doneDeliverables / Math.max(deliverables.length, 1)) * 100)}% complete` },

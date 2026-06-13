@@ -17,6 +17,22 @@
 }
 
 @layer base {
+  /* Prevent iOS Safari zoom on input focus without changing visual font size */
+  input[type="date"],
+  input[type="time"],
+  input[type="text"],
+  input[type="email"],
+  input[type="number"],
+  input[type="password"],
+  input[type="tel"],
+  input[type="url"],
+  select,
+  textarea {
+    font-size: 16px;
+    transform-origin: left top;
+  }
+
+  /* Scale text back down visually while keeping 16px for iOS */
   input[type="date"],
   input[type="time"] {
     width: 100%;

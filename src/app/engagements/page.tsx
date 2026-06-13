@@ -56,7 +56,7 @@ export default function EngagementsPage() {
 
   return (
     <div className="p-8 max-w-5xl">
-      <div className="flex items-center justify-between mb-8">
+      <div className="flex flex-col sm:flex-row sm:items-center gap-3 sm:gap-0 justify-between mb-8">
         <div>
           <h1 className="text-xl font-semibold text-gray-900">Engagements</h1>
           <p className="text-sm text-gray-500 mt-0.5">{engagements.filter(e => e.phase !== 'closed').length} active</p>
@@ -70,39 +70,44 @@ export default function EngagementsPage() {
         {engagements.map(eng => {
           const daysLeft = differenceInDays(new Date(eng.deadline), new Date());
           return (
-            <div key={eng.id} className="bg-white border border-gray-100 rounded-xl p-5">
-              <div className="flex items-start gap-4">
-                <div className="flex-1 min-w-0">
-                  <div className="flex items-center gap-3 mb-2">
-                    <span className="text-base font-medium text-gray-900">{eng.clientName}</span>
-                    <PhaseBadge phase={eng.phase} />
-                    {eng.frameworks.map(fw => (
-                      <span key={fw} className="text-xs bg-gray-100 text-gray-600 px-2 py-0.5 rounded">{fw}</span>
-                    ))}
-                  </div>
-                  {eng.notes && <p className="text-sm text-gray-500 mb-3 truncate">{eng.notes}</p>}
-                  <div className="flex items-center gap-4">
-                    <div className="flex-1 max-w-xs">
-                      <div className="flex justify-between text-xs text-gray-400 mb-1">
-                        <span>Progress</span><span>{eng.progress}%</span>
-                      </div>
-                      <div className="h-1.5 bg-gray-100 rounded-full overflow-hidden">
-                        <div
-                          className={`h-full rounded-full ${eng.progress >= 80 ? 'bg-red-400' : eng.progress >= 50 ? 'bg-amber-400' : 'bg-blue-400'}`}
-                          style={{ width: `${eng.progress}%` }}
-                        />
-                      </div>
-                    </div>
-                    <span className={`text-xs font-medium ${daysLeft < 0 ? 'text-red-600' : daysLeft <= 3 ? 'text-amber-600' : 'text-gray-400'}`}>
-                      {daysLeft < 0 ? `${Math.abs(daysLeft)}d overdue` : daysLeft === 0 ? 'Due today' : `${daysLeft}d left`} · {format(new Date(eng.deadline), 'd MMM yyyy')}
-                    </span>
-                  </div>
-                </div>
+            <div key={eng.id} className="bg-white border border-gray-100 rounded-xl p-4">
+              {/* Row 1: name + actions */}
+              <div className="flex items-start justify-between gap-2 mb-2">
+                <span className="text-base font-medium text-gray-900">{eng.clientName}</span>
                 <div className="flex gap-2 shrink-0">
                   <button onClick={() => openEdit(eng)} className="text-xs text-gray-400 hover:text-gray-700 px-2 py-1 rounded hover:bg-gray-50 transition-colors">Edit</button>
                   <button onClick={() => remove(eng.id)} className="text-xs text-gray-400 hover:text-red-600 px-2 py-1 rounded hover:bg-red-50 transition-colors">Remove</button>
                 </div>
               </div>
+
+              {/* Row 2: phase badge + framework tags */}
+              <div className="flex flex-wrap items-center gap-2 mb-3">
+                <PhaseBadge phase={eng.phase} />
+                {eng.frameworks.map(fw => (
+                  <span key={fw} className="text-xs bg-gray-100 text-gray-600 px-2 py-0.5 rounded">{fw}</span>
+                ))}
+              </div>
+
+              {/* Notes */}
+              {eng.notes && <p className="text-sm text-gray-400 mb-3 truncate">{eng.notes}</p>}
+
+              {/* Row 3: progress bar */}
+              <div className="mb-2">
+                <div className="flex justify-between text-xs text-gray-400 mb-1">
+                  <span>Progress</span><span>{eng.progress}%</span>
+                </div>
+                <div className="h-1.5 bg-gray-100 rounded-full overflow-hidden">
+                  <div
+                    className={`h-full rounded-full ${eng.progress >= 80 ? 'bg-red-400' : eng.progress >= 50 ? 'bg-amber-400' : 'bg-blue-400'}`}
+                    style={{ width: `${eng.progress}%` }}
+                  />
+                </div>
+              </div>
+
+              {/* Row 4: deadline */}
+              <span className={`text-xs font-medium ${daysLeft < 0 ? 'text-red-600' : daysLeft <= 3 ? 'text-amber-600' : 'text-gray-400'}`}>
+                {daysLeft < 0 ? `${Math.abs(daysLeft)}d overdue` : daysLeft === 0 ? 'Due today' : `${daysLeft}d left`} · {format(new Date(eng.deadline), 'd MMM yyyy')}
+              </span>
             </div>
           );
         })}

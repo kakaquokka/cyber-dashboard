@@ -8,7 +8,11 @@ export async function loadData<T>(table: TableName, fallback: T[]): Promise<T[]>
     .from(table)
     .select('data');
 
-  if (error || !data || data.length === 0) return fallback;
+  if (error) {
+    console.error(`Failed to load ${table}:`, error);
+    return fallback;
+  }
+  if (!data || data.length === 0) return [];
   return data.map((row: { data: T }) => row.data);
 }
 

@@ -78,7 +78,7 @@ export default function OverviewPage() {
       </div>
 
       {/* Metric cards */}
-      <div className="grid grid-cols-4 gap-4 mb-8">
+      <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
         {[
           { label: 'Active engagements', value: activeEngagements.length, sub: `${engagements.filter(e => e.phase === 'fieldwork').length} in fieldwork` },
           { label: 'Open tasks', value: pendingTasks.length, sub: `${pendingTasks.filter(t => t.priority === 'critical').length} critical` },
@@ -94,9 +94,9 @@ export default function OverviewPage() {
       </div>
 
       {/* Tasks + Clients */}
-      <div className="grid grid-cols-5 gap-6 mb-6">
+      <div className="grid grid-cols-1 md:grid-cols-5 gap-6 mb-6">
         {/* Priority tasks */}
-        <div className="col-span-3 bg-white border border-gray-100 rounded-xl p-5">
+        <div className="md:col-span-3 bg-white border border-gray-100 rounded-xl p-5">
           <h2 className="text-sm font-medium text-gray-500 mb-4">Priority tasks</h2>
           {pendingTasks.length === 0 && (
             <p className="text-sm text-gray-400">All tasks done. Nice work.</p>
@@ -124,7 +124,7 @@ export default function OverviewPage() {
         </div>
 
         {/* Client contacts */}
-        <div className="col-span-2 bg-white border border-gray-100 rounded-xl p-5">
+        <div className="md:col-span-2 bg-white border border-gray-100 rounded-xl p-5">
           <h2 className="text-sm font-medium text-gray-500 mb-4">Client contacts</h2>
           <ul className="space-y-0 divide-y divide-gray-50">
             {clients.slice(0, 4).map((c, i) => (
@@ -143,7 +143,7 @@ export default function OverviewPage() {
       </div>
 
       {/* Engagement progress + Deliverables */}
-      <div className="grid grid-cols-2 gap-6 mb-6">
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
         {/* Engagement progress */}
         <div className="bg-white border border-gray-100 rounded-xl p-5">
           <h2 className="text-sm font-medium text-gray-500 mb-4">Engagement progress</h2>
@@ -204,7 +204,7 @@ export default function OverviewPage() {
           <h2 className="text-sm font-medium text-gray-500">CPD — {new Date().getFullYear()}</h2>
           <span className="text-xs text-gray-400">{cpdTotal} / 40 hrs · {Math.round((cpdTotal / 40) * 100)}% of annual target</span>
         </div>
-        <div className="grid grid-cols-4 gap-4 items-center">
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-4 items-center">
           {cpd.slice(0, 3).map(entry => (
             <div key={entry.id} className="bg-gray-50 rounded-lg p-3">
               <div className="text-xs text-gray-400 capitalize mb-1">{entry.category}</div>

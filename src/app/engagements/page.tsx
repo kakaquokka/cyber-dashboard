@@ -110,8 +110,8 @@ export default function EngagementsPage() {
 
       {/* Modal */}
       {showModal && (
-        <div className="fixed inset-0 bg-black/40 flex items-center justify-center z-50 p-4">
-          <div className="bg-white rounded-2xl p-6 w-full max-w-lg shadow-xl">
+        <div className="fixed inset-0 bg-black/40 flex items-center justify-center z-50 p-2 md:p-4">
+          <div className="bg-white rounded-2xl p-6 w-full max-w-lg shadow-xl max-h-screen overflow-y-auto">
             <h2 className="text-base font-semibold text-gray-900 mb-5">{editing ? 'Edit engagement' : 'New engagement'}</h2>
             <div className="space-y-4">
               <div>

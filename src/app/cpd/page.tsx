@@ -123,7 +123,16 @@ export default function CpdPage() {
               <div className="flex flex-col gap-3">
                 <div className="w-full min-w-0">
                   <label className="block text-xs text-gray-500 mb-1">Date</label>
-                  <input type="date" className="w-full max-w-full block border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-200" value={form.date} onChange={e => setForm(f => ({ ...f, date: e.target.value }))} />
+                  <input
+                    type="text"
+                    inputMode="none"
+                    placeholder="YYYY-MM-DD"
+                    onFocus={e => { (e.target as HTMLInputElement).type = 'date'; }}
+                    onBlur={e => { if (!(e.target as HTMLInputElement).value) (e.target as HTMLInputElement).type = 'text'; }}
+                    className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-200"
+                    value={form.date}
+                    onChange={e => setForm(f => ({ ...f, date: e.target.value }))}
+                  />
                 </div>
                 <div>
                   <label className="block text-xs text-gray-500 mb-1">Hours</label>

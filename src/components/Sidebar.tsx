@@ -2,6 +2,8 @@
 
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
+import { logout } from '@/lib/auth';
+import { useRouter } from 'next/navigation';
 
 const navItems = [
   { href: '/', label: 'Overview', icon: '⬡' },
@@ -13,7 +15,8 @@ const navItems = [
 
 export default function Sidebar() {
   const pathname = usePathname();
-
+  const router = useRouter();
+  function handleLogout() { logout(); router.push('/login'); }
   return (
     <aside className="hidden md:flex w-52 min-h-screen bg-gray-950 text-gray-400 flex flex-col px-4 py-6 shrink-0">
       <div className="mb-8 px-2">
@@ -45,6 +48,9 @@ export default function Sidebar() {
         <div className="text-xs text-gray-600">
           {new Date().toLocaleDateString('en-GB', { weekday: 'short', day: 'numeric', month: 'short', year: 'numeric' })}
         </div>
+        <button onClick={handleLogout} className="text-xs text-gray-600 hover:text-gray-300 mt-2 transition-colors">
+          Lock dashboard
+        </button>
       </div>
     </aside>
   );

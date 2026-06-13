@@ -8,6 +8,7 @@ const navItems = [
   { href: '/clients', label: 'Clients' },
   { href: '/deliverables', label: 'Deliverables' },
   { href: '/cpd', label: 'CPD' },
+  { href: '/calendar', label: 'Calendar' },
 ];
 
 export default function MobileNav() {

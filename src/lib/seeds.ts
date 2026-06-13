@@ -1,4 +1,5 @@
 import { Engagement, Client, Task, Deliverable, CpdEntry } from './types';
+import { CalendarEvent } from './types';
 
 export const seedEngagements: Engagement[] = [
   { id: 'eng-1', clientName: 'Bank A', phase: 'assessment', progress: 75, deadline: '2025-06-20', frameworks: ['ISO 27001', 'MAS TRM'], notes: 'Focus on access control and privileged accounts.' },
@@ -38,4 +39,30 @@ export const seedCpd: CpdEntry[] = [
   { id: 'cpd-1', title: 'ISO 27001 Lead Auditor', provider: 'BSI Group', date: '2025-05-10', hours: 16, category: 'course' },
   { id: 'cpd-2', title: 'ISACA CISA Webinar', provider: 'ISACA', date: '2025-06-10', hours: 2, category: 'webinar' },
   { id: 'cpd-3', title: 'MAS TRM Update Session', provider: 'MAS', date: '2025-04-22', hours: 3, category: 'conference' },
+];
+
+export const seedEvents: CalendarEvent[] = [
+  {
+    id: 'evt-1',
+    title: 'Bank A — Fieldwork Kickoff',
+    date: new Date(Date.now() + 2 * 86400000).toISOString().split('T')[0],
+    time: '10:00',
+    endTime: '11:00',
+    mode: 'online',
+    meetingApp: 'Teams',
+    meetingLink: 'https://teams.microsoft.com/meet/example',
+    engagementId: 'eng-1',
+    notes: 'Discuss access control scope.',
+  },
+  {
+    id: 'evt-2',
+    title: 'Corp B — Report Review',
+    date: new Date(Date.now() + 5 * 86400000).toISOString().split('T')[0],
+    time: '14:00',
+    endTime: '15:00',
+    mode: 'offline',
+    location: 'Corp B HQ, Level 12 Meeting Room',
+    engagementId: 'eng-2',
+    notes: 'Bring printed draft report.',
+  },
 ];

@@ -6,6 +6,8 @@ import { Engagement, Client, Task, Deliverable, CpdEntry } from '@/lib/types';
 import { seedEngagements, seedClients, seedTasks, seedDeliverables, seedCpd } from '@/lib/seeds';
 import { PriorityBadge } from '@/components/Badge';
 import { format, isToday, isTomorrow, differenceInDays } from 'date-fns';
+import { CalendarEvent } from '@/lib/types';
+import { seedEvents } from '@/lib/seeds';
 
 function dueDateLabel(dateStr: string): string {
   const d = new Date(dateStr);
@@ -41,6 +43,7 @@ export default function OverviewPage() {
   const [tasks, setTasks] = useState<Task[]>([]);
   const [deliverables, setDeliverables] = useState<Deliverable[]>([]);
   const [cpd, setCpd] = useState<CpdEntry[]>([]);
+  const [calEvents, setCalEvents] = useState<CalendarEvent[]>([]);
 
   useEffect(() => {
     loadData('engagements', seedEngagements).then(setEngagements);
@@ -48,6 +51,7 @@ export default function OverviewPage() {
     loadData('tasks', seedTasks).then(setTasks);
     loadData('deliverables', seedDeliverables).then(setDeliverables);
     loadData('cpd', seedCpd).then(setCpd);
+    loadData('events', seedEvents).then(setCalEvents);
   }, []);
 
   const activeEngagements = engagements.filter(e => e.phase !== 'closed');
@@ -68,7 +72,7 @@ export default function OverviewPage() {
   }
 
   return (
-    <div className="p-8 max-w-6xl">
+    <div className="p-4 md:p-8 max-w-6xl pb-24">
       {/* Header */}
       <div className="mb-8">
         <h1 className="text-xl font-semibold text-gray-900">Good morning</h1>
@@ -77,10 +81,61 @@ export default function OverviewPage() {
         </p>
       </div>
 
+      {/* Upcoming schedule — reminder strip */}
+      {(() => {
+        const today = new Date();
+        const todayStr = format(today, 'yyyy-MM-dd');
+        const in7 = new Date(today.getTime() + 7 * 86400000);
+        const upcoming = calEvents
+          .filter(e => e.date >= todayStr && new Date(e.date) <= in7)
+          .sort((a, b) => (a.date + a.time).localeCompare(b.date + b.time))
+          .slice(0, 5);
+        const upcomingDels = deliverables
+          .filter(d => !d.done && d.dueDate >= todayStr && new Date(d.dueDate) <= in7)
+          .sort((a, b) => a.dueDate.localeCompare(b.dueDate));
+
+        if (upcoming.length === 0 && upcomingDels.length === 0) return null;
+
+        return (
+          <div className="bg-blue-50 border border-blue-100 rounded-xl p-4 mb-6">
+            <h2 className="text-xs font-medium text-blue-600 uppercase tracking-wider mb-3">Coming up — next 7 days</h2>
+            <div className="space-y-2">
+              {upcoming.map(evt => (
+                <div key={evt.id} className="flex items-center gap-3 py-1">
+                  <span className="w-2 h-2 rounded-full bg-blue-400 shrink-0" />
+                  <div className="flex-1 min-w-0">
+                    <span className="text-sm text-gray-800">{evt.title}</span>
+                    <span className="text-xs text-gray-400 ml-2">{evt.mode === 'online' ? evt.meetingApp : evt.location}</span>
+                  </div>
+                  <span className="text-xs text-blue-500 shrink-0 font-medium">
+                    {isToday(new Date(evt.date)) ? 'Today' : format(new Date(evt.date), 'd MMM')} {evt.time}
+                  </span>
+                </div>
+              ))}
+              {upcomingDels.map(d => {
+                const eng = engagements.find(e => e.id === d.engagementId);
+                return (
+                  <div key={d.id} className="flex items-center gap-3 py-1">
+                    <span className="w-2 h-2 rounded-full bg-red-400 shrink-0" />
+                    <div className="flex-1 min-w-0">
+                      <span className="text-sm text-gray-800">{d.title}</span>
+                      {eng && <span className="text-xs text-gray-400 ml-2">— {eng.clientName}</span>}
+                    </div>
+                    <span className={`text-xs shrink-0 font-medium ${dueDateColor(d.dueDate)}`}>
+                      {dueDateLabel(d.dueDate)}
+                    </span>
+                  </div>
+                );
+              })}
+            </div>
+          </div>
+        );
+      })()}
+
       {/* Metric cards */}
       <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
         {[
-          { label: 'Active engagements', value: activeEngagements.length, sub: `${engagements.filter(e => e.phase === 'assessment').length} in fieldwork` },
+          { label: 'Active engagements', value: activeEngagements.length, sub: `${engagements.filter(e => e.phase === 'assessment').length} in assessment` },
           { label: 'Open tasks', value: pendingTasks.length, sub: `${pendingTasks.filter(t => t.priority === 'critical').length} critical` },
           { label: 'Deadlines this week', value: upcomingDeadlines, sub: 'across all engagements' },
           { label: 'Deliverables done', value: `${doneDeliverables}/${deliverables.length}`, sub: `${Math.round((doneDeliverables / Math.max(deliverables.length, 1)) * 100)}% complete` },
@@ -199,7 +254,7 @@ export default function OverviewPage() {
       </div>
 
       {/* CPD strip */}
-      <div className="bg-white border border-gray-100 rounded-xl p-5">
+      <div className="bg-white border border-gray-100 rounded-xl p-5 mb-6">
         <div className="flex items-center justify-between mb-4">
           <h2 className="text-sm font-medium text-gray-500">CPD — {new Date().getFullYear()}</h2>
           <span className="text-xs text-gray-400">{cpdTotal} / 40 hrs · {Math.round((cpdTotal / 40) * 100)}% of annual target</span>

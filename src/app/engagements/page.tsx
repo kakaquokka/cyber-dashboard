@@ -8,7 +8,6 @@ import { PhaseBadge } from '@/components/Badge';
 import { format, differenceInDays } from 'date-fns';
 
 const phases: Phase[] = ['planning', 'assessment', 'reporting', 'closed'];
-const allFrameworks = ['ISO 27001', 'NIST CSF', 'MAS TRM', 'CIS Controls', 'CSMS', 'PCI DSS', 'SOC 2'];
 
 const emptyForm: Omit<Engagement, 'id'> = {
   clientName: '', phase: 'planning', progress: 0,
@@ -20,6 +19,7 @@ export default function EngagementsPage() {
   const [showModal, setShowModal] = useState(false);
   const [editing, setEditing] = useState<Engagement | null>(null);
   const [form, setForm] = useState<Omit<Engagement, 'id'>>(emptyForm);
+  const [fwInput, setFwInput] = useState('');
 
   useEffect(() => { loadData('engagements', seedEngagements).then(setEngagements); }, []);
 
@@ -115,8 +115,8 @@ export default function EngagementsPage() {
 
       {/* Modal */}
       {showModal && (
-        <div className="fixed inset-0 bg-black/40 flex items-center justify-center z-50 p-2 md:p-4">
-          <div className="bg-white rounded-2xl p-6 w-full max-w-lg shadow-xl max-h-screen overflow-y-auto">
+        <div className="fixed inset-0 bg-black/40 flex items-end sm:items-center justify-center z-50">
+          <div className="bg-white rounded-t-2xl sm:rounded-2xl p-5 w-full sm:max-w-lg shadow-xl max-h-[90vh] overflow-y-auto">
             <h2 className="text-base font-semibold text-gray-900 mb-5">{editing ? 'Edit engagement' : 'New engagement'}</h2>
             <div className="space-y-4">
               <div>
@@ -141,12 +141,46 @@ export default function EngagementsPage() {
               </div>
               <div>
                 <label className="block text-xs text-gray-500 mb-2">Frameworks</label>
-                <div className="flex flex-wrap gap-2">
-                  {allFrameworks.map(fw => (
-                    <button key={fw} onClick={() => toggleFramework(fw)} className={`text-xs px-2.5 py-1 rounded-md border transition-colors ${form.frameworks.includes(fw) ? 'bg-blue-100 text-blue-800 border-blue-200' : 'bg-gray-50 text-gray-600 border-gray-200 hover:bg-gray-100'}`}>
+                <div className="flex flex-wrap gap-2 mb-2">
+                  {form.frameworks.map(fw => (
+                    <span key={fw} className="inline-flex items-center gap-1 text-xs bg-blue-100 text-blue-800 border border-blue-200 px-2.5 py-1 rounded-md">
                       {fw}
-                    </button>
+                      <button
+                        type="button"
+                        onClick={() => setForm(f => ({ ...f, frameworks: f.frameworks.filter(x => x !== fw) }))}
+                        className="text-blue-400 hover:text-blue-700 leading-none ml-0.5"
+                      >✕</button>
+                    </span>
                   ))}
+                </div>
+                <div className="flex gap-2">
+                  <input
+                    className="flex-1 border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-200"
+                    placeholder="e.g. ISO 27001, NIST CSF..."
+                    value={fwInput}
+                    onChange={e => setFwInput(e.target.value)}
+                    onKeyDown={e => {
+                      if (e.key === 'Enter') {
+                        e.preventDefault();
+                        const val = fwInput.trim();
+                        if (val && !form.frameworks.includes(val)) {
+                          setForm(f => ({ ...f, frameworks: [...f.frameworks, val] }));
+                        }
+                        setFwInput('');
+                      }
+                    }}
+                  />
+                  <button
+                    type="button"
+                    onClick={() => {
+                      const val = fwInput.trim();
+                      if (val && !form.frameworks.includes(val)) {
+                        setForm(f => ({ ...f, frameworks: [...f.frameworks, val] }));
+                      }
+                      setFwInput('');
+                    }}
+                    className="text-sm bg-gray-900 text-white px-3 py-2 rounded-lg hover:bg-gray-700 transition-colors shrink-0"
+                  >Add</button>
                 </div>
               </div>
               <div>

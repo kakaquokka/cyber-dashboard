@@ -46,3 +46,20 @@ export interface CpdEntry {
   hours: number;
   category: 'course' | 'webinar' | 'conference' | 'self-study' | 'workshop';
 }
+
+export type MeetingMode = 'online' | 'offline';
+export type MeetingApp = 'Zoom' | 'Teams' | 'Google Meet' | 'Webex' | 'Other';
+
+export interface CalendarEvent {
+  id: string;
+  title: string;
+  date: string;       // YYYY-MM-DD
+  time: string;       // HH:MM
+  endTime?: string;
+  mode: MeetingMode;
+  meetingApp?: MeetingApp;
+  meetingLink?: string;
+  location?: string;
+  notes?: string;
+  engagementId?: string;
+}

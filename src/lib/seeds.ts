@@ -1,7 +1,7 @@
 import { Engagement, Client, Task, Deliverable, CpdEntry } from './types';
 
 export const seedEngagements: Engagement[] = [
-  { id: 'eng-1', clientName: 'Bank A', phase: 'fieldwork', progress: 75, deadline: '2025-06-20', frameworks: ['ISO 27001', 'MAS TRM'], notes: 'Focus on access control and privileged accounts.' },
+  { id: 'eng-1', clientName: 'Bank A', phase: 'assessment', progress: 75, deadline: '2025-06-20', frameworks: ['ISO 27001', 'MAS TRM'], notes: 'Focus on access control and privileged accounts.' },
   { id: 'eng-2', clientName: 'Corp B', phase: 'reporting', progress: 50, deadline: '2025-06-24', frameworks: ['ISO 27001'], notes: 'ISMS gap analysis in progress.' },
   { id: 'eng-3', clientName: 'FinTech C', phase: 'planning', progress: 20, deadline: '2025-07-10', frameworks: ['NIST CSF', 'MAS TRM'], notes: 'Scope still being finalised with client.' },
   { id: 'eng-4', clientName: 'Gov D', phase: 'reporting', progress: 90, deadline: '2025-06-18', frameworks: ['CSMS'], notes: 'Nearly complete — final review pending.' },
@@ -26,7 +26,7 @@ export const seedTasks: Task[] = [
 
 export const seedDeliverables: Deliverable[] = [
   { id: 'del-1', engagementId: 'eng-1', title: 'Kickoff deck', dueDate: '2025-05-15', done: true },
-  { id: 'del-2', engagementId: 'eng-2', title: 'Fieldwork plan', dueDate: '2025-05-28', done: true },
+  { id: 'del-2', engagementId: 'eng-2', title: 'Assessment plan', dueDate: '2025-05-28', done: true },
   { id: 'del-3', engagementId: 'eng-4', title: 'Risk assessment', dueDate: '2025-06-01', done: true },
   { id: 'del-4', engagementId: 'eng-1', title: 'Draft audit report', dueDate: '2025-06-20', done: false },
   { id: 'del-5', engagementId: 'eng-2', title: 'Gap analysis report', dueDate: '2025-06-24', done: false },

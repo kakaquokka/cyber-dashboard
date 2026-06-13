@@ -9,7 +9,7 @@ const priorityStyles: Record<Priority, string> = {
 
 const phaseStyles: Record<Phase, string> = {
   planning: 'bg-purple-100 text-purple-800',
-  fieldwork: 'bg-amber-100 text-amber-800',
+  assessment: 'bg-amber-100 text-amber-800',
   reporting: 'bg-blue-100 text-blue-800',
   closed: 'bg-gray-100 text-gray-600',
 };

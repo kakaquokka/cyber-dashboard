@@ -65,10 +65,10 @@ export default function OverviewPage() {
     .filter(e => e.phase !== 'closed' && differenceInDays(new Date(e.deadline), new Date()) <= 7)
     .length;
 
-  function toggleTask(id: string) {
+  async function toggleTask(id: string) {
     const updated = tasks.map(t => t.id === id ? { ...t, done: !t.done } : t);
     setTasks(updated);
-    saveData('tasks', updated);
+    await saveData('tasks', updated);
   }
 
   async function addTask() {
@@ -171,12 +171,10 @@ export default function OverviewPage() {
         <div className="bg-white border border-gray-100 rounded-xl p-5">
           <div className="flex items-center justify-between mb-4">
             <h2 className="text-sm font-medium text-gray-500">Priority tasks</h2>
-            <button
-              onClick={() => setShowTaskModal(true)}
-              className="text-xs text-gray-400 hover:text-gray-700 px-2 py-1 rounded hover:bg-gray-50 transition-colors"
-            >
-              + Add task
-            </button>
+            <div className="flex items-center gap-2">
+              <a href="/tasks" className="text-xs text-gray-400 hover:text-gray-700 px-2 py-1 rounded hover:bg-gray-50 transition-colors">View all</a>
+              <button onClick={() => setShowTaskModal(true)} className="text-xs text-gray-400 hover:text-gray-700 px-2 py-1 rounded hover:bg-gray-50 transition-colors">+ Add task</button>
+            </div>
           </div>
           {pendingTasks.length === 0 && (
             <p className="text-sm text-gray-400">No open tasks. Add one to get started.</p>

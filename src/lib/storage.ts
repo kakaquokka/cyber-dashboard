@@ -37,3 +37,14 @@ export async function deleteRow(table: TableName, id: string): Promise<void> {
 
   if (error) console.error(`Failed to delete from ${table}:`, error);
 }
+
+export async function saveItem<T extends { id: string }>(
+  table: TableName,
+  item: T
+): Promise<void> {
+  const { error } = await supabase
+    .from(table)
+    .upsert({ id: item.id, data: item }, { onConflict: 'id' });
+
+  if (error) console.error(`Failed to save item to ${table}:`, error);
+}

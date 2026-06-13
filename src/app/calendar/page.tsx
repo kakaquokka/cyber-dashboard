@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { loadData, saveData, deleteRow } from '@/lib/storage';
+import { loadData, saveData, deleteRow, saveItem } from '@/lib/storage';
 import { CalendarEvent, Engagement, Deliverable, MeetingApp, MeetingMode } from '@/lib/types';
 import { seedEvents, seedEngagements, seedDeliverables } from '@/lib/seeds';
 import { format, startOfMonth, endOfMonth, eachDayOfInterval, isSameDay,
@@ -50,11 +50,10 @@ export default function CalendarPage() {
   async function save() {
     if (!form.title.trim() || !form.date || !form.time) return;
     const newEvt: CalendarEvent = { ...form, id: `evt-${Date.now()}` };
-    setCalEvents(prev => {
-        const updated = [...prev, newEvt].sort((a, b) => (a.date + a.time).localeCompare(b.date + b.time));
-        saveData('events', updated);
-        return updated;
-    });
+    await saveItem('events', newEvt);
+    setCalEvents(prev =>
+        [...prev, newEvt].sort((a, b) => (a.date + a.time).localeCompare(b.date + b.time))
+    );
     setShowModal(false);
     setForm(emptyForm);
     }
@@ -68,11 +67,12 @@ export default function CalendarPage() {
 
   async function saveEdit() {
     if (!editingEvent || !editForm.title.trim() || !editForm.date || !editForm.time) return;
-    const updated = calEvents.map(e =>
-        e.id === editingEvent.id ? { ...editingEvent, ...editForm } : e
-    ).sort((a, b) => (a.date + a.time).localeCompare(b.date + b.time));
-    setCalEvents(updated);
-    await saveData('events', updated);
+    const updated = { ...editingEvent, ...editForm };
+    await saveItem('events', updated);
+    setCalEvents(prev =>
+        prev.map(e => e.id === editingEvent.id ? updated : e)
+        .sort((a, b) => (a.date + a.time).localeCompare(b.date + b.time))
+    );
     setEditingEvent(null);
     setShowDetail(null);
     }

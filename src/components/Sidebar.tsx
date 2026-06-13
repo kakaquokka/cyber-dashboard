@@ -7,8 +7,9 @@ import { logout } from '@/lib/auth';
 const navItems = [
   { href: '/', label: 'Overview', icon: '⬡' },
   { href: '/engagements', label: 'Engagements', icon: '◈' },
-  { href: '/clients', label: 'Clients', icon: '◎' },
+  { href: '/tasks', label: 'Tasks', icon: '☑' },
   { href: '/deliverables', label: 'Deliverables', icon: '◻' },
+  { href: '/clients', label: 'Clients', icon: '◎' },
   { href: '/cpd', label: 'CPD log', icon: '◇' },
   { href: '/calendar', label: 'Calendar', icon: '◫' },
 ];

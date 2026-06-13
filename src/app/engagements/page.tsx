@@ -23,11 +23,29 @@ export default function EngagementsPage() {
 
   useEffect(() => { loadData('engagements', seedEngagements).then(setEngagements); }, []);
 
-  function openNew() { setEditing(null); setForm(emptyForm); setShowModal(true); }
-  function openEdit(e: Engagement) { setEditing(e); setForm({ clientName: e.clientName, engagementName: e.engagementName, phase: e.phase, progress: e.progress, deadline: e.deadline, frameworks: e.frameworks, notes: e.notes }); setShowModal(true); }
+  function openNew() { setEditing(null); setForm(emptyForm); setFwInput(''); setShowModal(true); }
 
-  function save() {
-    if (!form.clientName.trim() || !form.deadline) return;
+  function openEdit(e: Engagement) {
+    setEditing(e);
+    setForm({
+      clientName: e.clientName,
+      engagementName: e.engagementName || '',
+      phase: e.phase,
+      progress: e.progress || 0,
+      deadline: e.deadline || '',
+      frameworks: e.frameworks || [],
+      notes: e.notes || '',
+      hasPartner: e.hasPartner || false,
+      partnerName: e.partnerName || '',
+    });
+    setFwInput('');
+    setShowModal(true);
+  }
+
+  async function save() {
+    if (!form.clientName.trim()) return;
+    // Only require deadline if not partnership
+    if (form.phase !== 'partnership' && !form.deadline) return;
     let updated: Engagement[];
     if (editing) {
       updated = engagements.map(e => e.id === editing.id ? { ...editing, ...form } : e);
@@ -36,82 +54,90 @@ export default function EngagementsPage() {
       updated = [...engagements, newEng];
     }
     setEngagements(updated);
-    saveData('engagements', updated);
+    await saveData('engagements', updated);
     setShowModal(false);
   }
 
-  function remove(id: string) {
+  async function remove(id: string) {
     if (!confirm('Remove this engagement?')) return;
     const updated = engagements.filter(e => e.id !== id);
     setEngagements(updated);
     deleteRow('engagements', id);
   }
 
-  function toggleFramework(fw: string) {
-    setForm(f => ({
-      ...f,
-      frameworks: f.frameworks.includes(fw) ? f.frameworks.filter(x => x !== fw) : [...f.frameworks, fw],
-    }));
-  }
-
   return (
-    <div className="p-8 max-w-5xl">
+    <div className="p-4 md:p-8 max-w-5xl pb-24">
       <div className="flex flex-col sm:flex-row sm:items-center gap-3 sm:gap-0 justify-between mb-8">
         <div>
           <h1 className="text-xl font-semibold text-gray-900">Engagements</h1>
           <p className="text-sm text-gray-500 mt-0.5">{engagements.filter(e => e.phase !== 'closed').length} active</p>
         </div>
-        <button onClick={openNew} className="text-sm bg-gray-900 text-white px-4 py-2 rounded-lg hover:bg-gray-700 transition-colors">
+        <button onClick={openNew} className="text-sm bg-gray-900 text-white px-4 py-2 rounded-lg hover:bg-gray-700 transition-colors self-start sm:self-auto">
           + New engagement
         </button>
       </div>
 
       <div className="space-y-3">
         {engagements.map(eng => {
-          const daysLeft = differenceInDays(new Date(eng.deadline), new Date());
+          const isPartnership = eng.phase === 'partnership';
+          const daysLeft = eng.deadline ? differenceInDays(new Date(eng.deadline), new Date()) : null;
+
           return (
             <div key={eng.id} className="bg-white border border-gray-100 rounded-xl p-4">
-              {/* Row 1: name + actions */}
-              <div className="flex items-center gap-3 mb-2">
-                <span className="text-base font-medium text-gray-900">{eng.clientName}</span>
-                {eng.engagementName && <span className="text-sm text-gray-400">{eng.engagementName}</span>}
+              {/* Row 1: client + engagement name + actions */}
+              <div className="flex items-start justify-between gap-2 mb-2">
+                <div className="min-w-0">
+                  <span className="text-base font-medium text-gray-900">{eng.clientName}</span>
+                  {eng.engagementName && (
+                    <span className="text-sm text-gray-400 ml-2">{eng.engagementName}</span>
+                  )}
+                </div>
                 <div className="flex gap-2 shrink-0">
                   <button onClick={() => openEdit(eng)} className="text-xs text-gray-400 hover:text-gray-700 px-2 py-1 rounded hover:bg-gray-50 transition-colors">Edit</button>
                   <button onClick={() => remove(eng.id)} className="text-xs text-gray-400 hover:text-red-600 px-2 py-1 rounded hover:bg-red-50 transition-colors">Remove</button>
                 </div>
               </div>
 
-              {/* Row 2: phase badge + framework tags */}
-              <div className="flex flex-wrap items-center gap-2 mb-3">
+              {/* Row 2: phase badge + frameworks */}
+              <div className="flex flex-wrap items-center gap-2 mb-2">
                 <PhaseBadge phase={eng.phase} />
-                {eng.frameworks.map(fw => (
+                {eng.frameworks?.map(fw => (
                   <span key={fw} className="text-xs bg-gray-100 text-gray-600 px-2 py-0.5 rounded">{fw}</span>
                 ))}
               </div>
 
-              {/* Notes */}
+              {/* Partner */}
               {eng.hasPartner && eng.partnerName && (
-                    <p className="text-xs text-purple-600 mb-1">Partner: {eng.partnerName}</p>
+                <p className="text-xs text-purple-600 mb-2">Partner: {eng.partnerName}</p>
               )}
-              {eng.notes && <p className="text-sm text-gray-400 mb-3 truncate">{eng.notes}</p>}
 
-              {/* Row 3: progress bar */}
-              <div className="mb-2">
-                <div className="flex justify-between text-xs text-gray-400 mb-1">
-                  <span>Progress</span><span>{eng.progress}%</span>
-                </div>
-                <div className="h-1.5 bg-gray-100 rounded-full overflow-hidden">
-                  <div
-                    className={`h-full rounded-full ${eng.progress >= 80 ? 'bg-red-400' : eng.progress >= 50 ? 'bg-amber-400' : 'bg-blue-400'}`}
-                    style={{ width: `${eng.progress}%` }}
-                  />
-                </div>
-              </div>
+              {/* Notes */}
+              {eng.notes && (
+                <p className="text-sm text-gray-400 mb-2 truncate">{eng.notes}</p>
+              )}
 
-              {/* Row 4: deadline */}
-              <span className={`text-xs font-medium ${daysLeft < 0 ? 'text-red-600' : daysLeft <= 3 ? 'text-amber-600' : 'text-gray-400'}`}>
-                {daysLeft < 0 ? `${Math.abs(daysLeft)}d overdue` : daysLeft === 0 ? 'Due today' : `${daysLeft}d left`} · {format(new Date(eng.deadline), 'd MMM yyyy')}
-              </span>
+              {/* Progress + deadline — only for non-partnership */}
+              {!isPartnership && (
+                <>
+                  <div className="mb-2">
+                    <div className="flex justify-between text-xs text-gray-400 mb-1">
+                      <span>Progress</span><span>{eng.progress}%</span>
+                    </div>
+                    <div className="h-1.5 bg-gray-100 rounded-full overflow-hidden">
+                      <div
+                        className={`h-full rounded-full ${eng.progress >= 80 ? 'bg-red-400' : eng.progress >= 50 ? 'bg-amber-400' : 'bg-blue-400'}`}
+                        style={{ width: `${eng.progress}%` }}
+                      />
+                    </div>
+                  </div>
+                  {daysLeft !== null && (
+                    <span className={`text-xs font-medium ${daysLeft < 0 ? 'text-red-600' : daysLeft <= 3 ? 'text-amber-600' : 'text-gray-400'}`}>
+                      {daysLeft < 0 ? `${Math.abs(daysLeft)}d overdue` : daysLeft === 0 ? 'Due today' : `${daysLeft}d left`}
+                      {eng.deadline && ` · ${format(new Date(eng.deadline), 'd MMM yyyy')}`}
+                    </span>
+                  )}
+                </>
+              )}
             </div>
           );
         })}
@@ -121,7 +147,9 @@ export default function EngagementsPage() {
       {showModal && (
         <div className="fixed inset-0 bg-black/40 flex items-end sm:items-center justify-center z-50">
           <div className="bg-white rounded-t-2xl sm:rounded-2xl p-5 w-full sm:max-w-lg shadow-xl max-h-[90vh] overflow-y-auto">
-            <h2 className="text-base font-semibold text-gray-900 mb-5">{editing ? 'Edit engagement' : 'New engagement'}</h2>
+            <h2 className="text-base font-semibold text-gray-900 mb-5">
+              {editing ? 'Edit engagement' : 'New engagement'}
+            </h2>
             <div className="space-y-4">
               <div>
                 <label className="block text-xs text-gray-500 mb-1">Client name</label>
@@ -137,6 +165,8 @@ export default function EngagementsPage() {
                   {phases.map(p => <option key={p} value={p}>{p.charAt(0).toUpperCase() + p.slice(1)}</option>)}
                 </select>
               </div>
+
+              {/* All other fields hidden for partnership */}
               {form.phase !== 'partnership' && (
                 <>
                   <div>
@@ -147,74 +177,58 @@ export default function EngagementsPage() {
                     <label className="block text-xs text-gray-500 mb-1">Progress — {form.progress}%</label>
                     <input type="range" min={0} max={100} step={5} className="w-full" value={form.progress} onChange={e => setForm(f => ({ ...f, progress: Number(e.target.value) }))} />
                   </div>
+                  <div>
+                    <label className="block text-xs text-gray-500 mb-2">Frameworks</label>
+                    <div className="flex flex-wrap gap-2 mb-2">
+                      {form.frameworks.map(fw => (
+                        <span key={fw} className="inline-flex items-center gap-1 text-xs bg-blue-100 text-blue-800 border border-blue-200 px-2.5 py-1 rounded-md">
+                          {fw}
+                          <button type="button" onClick={() => setForm(f => ({ ...f, frameworks: f.frameworks.filter(x => x !== fw) }))} className="text-blue-400 hover:text-blue-700 leading-none ml-0.5">✕</button>
+                        </span>
+                      ))}
+                    </div>
+                    <div className="flex gap-2">
+                      <input
+                        className="flex-1 border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-200"
+                        placeholder="e.g. ISO 27001, NIST CSF..."
+                        value={fwInput}
+                        onChange={e => setFwInput(e.target.value)}
+                        onKeyDown={e => {
+                          if (e.key === 'Enter') {
+                            e.preventDefault();
+                            const val = fwInput.trim();
+                            if (val && !form.frameworks.includes(val)) setForm(f => ({ ...f, frameworks: [...f.frameworks, val] }));
+                            setFwInput('');
+                          }
+                        }}
+                      />
+                      <button type="button" onClick={() => { const val = fwInput.trim(); if (val && !form.frameworks.includes(val)) setForm(f => ({ ...f, frameworks: [...f.frameworks, val] })); setFwInput(''); }} className="text-sm bg-gray-900 text-white px-3 py-2 rounded-lg hover:bg-gray-700 transition-colors shrink-0">Add</button>
+                    </div>
+                  </div>
+                  <div>
+                    <label className="block text-xs text-gray-500 mb-2">Working with a partner firm?</label>
+                    <div className="flex gap-2">
+                      {[true, false].map(val => (
+                        <button key={String(val)} type="button"
+                          onClick={() => setForm(f => ({ ...f, hasPartner: val, partnerName: val ? f.partnerName : '' }))}
+                          className={`flex-1 text-sm py-2 rounded-lg border transition-colors ${form.hasPartner === val ? 'bg-gray-900 text-white border-gray-900' : 'bg-gray-50 text-gray-600 border-gray-200 hover:bg-gray-100'}`}>
+                          {val ? 'Yes' : 'No'}
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+                  {form.hasPartner && (
+                    <div>
+                      <label className="block text-xs text-gray-500 mb-1">Partner firm name</label>
+                      <input className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-200" value={form.partnerName} onChange={e => setForm(f => ({ ...f, partnerName: e.target.value }))} placeholder="e.g. Deloitte" />
+                    </div>
+                  )}
+                  <div>
+                    <label className="block text-xs text-gray-500 mb-1">Notes</label>
+                    <textarea className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-200 resize-none" rows={3} value={form.notes} onChange={e => setForm(f => ({ ...f, notes: e.target.value }))} placeholder="Scope, key focus areas, etc." />
+                  </div>
                 </>
               )}
-              <div>
-                <label className="block text-xs text-gray-500 mb-2">Partnership</label>
-                <div className="flex gap-2">
-                  {[true, false].map(val => (
-                    <button key={String(val)} type="button"
-                      onClick={() => setForm(f => ({ ...f, hasPartner: val, partnerName: val ? f.partnerName : '' }))}
-                      className={`flex-1 text-sm py-2 rounded-lg border transition-colors ${form.hasPartner === val ? 'bg-gray-900 text-white border-gray-900' : 'bg-gray-50 text-gray-600 border-gray-200 hover:bg-gray-100'}`}>
-                      {val ? 'Yes' : 'No'}
-                    </button>
-                  ))}
-                </div>
-              </div>
-              {form.hasPartner && (
-                <div>
-                  <label className="block text-xs text-gray-500 mb-1">Partner name</label>
-                  <input className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-200" value={form.partnerName} onChange={e => setForm(f => ({ ...f, partnerName: e.target.value }))} placeholder="e.g. Deloitte" />
-                </div>
-              )}
-              <div>
-                <label className="block text-xs text-gray-500 mb-2">Frameworks</label>
-                <div className="flex flex-wrap gap-2 mb-2">
-                  {form.frameworks.map(fw => (
-                    <span key={fw} className="inline-flex items-center gap-1 text-xs bg-blue-100 text-blue-800 border border-blue-200 px-2.5 py-1 rounded-md">
-                      {fw}
-                      <button
-                        type="button"
-                        onClick={() => setForm(f => ({ ...f, frameworks: f.frameworks.filter(x => x !== fw) }))}
-                        className="text-blue-400 hover:text-blue-700 leading-none ml-0.5"
-                      >✕</button>
-                    </span>
-                  ))}
-                </div>
-                <div className="flex gap-2">
-                  <input
-                    className="flex-1 border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-200"
-                    placeholder="e.g. ISO 27001, NIST CSF..."
-                    value={fwInput}
-                    onChange={e => setFwInput(e.target.value)}
-                    onKeyDown={e => {
-                      if (e.key === 'Enter') {
-                        e.preventDefault();
-                        const val = fwInput.trim();
-                        if (val && !form.frameworks.includes(val)) {
-                          setForm(f => ({ ...f, frameworks: [...f.frameworks, val] }));
-                        }
-                        setFwInput('');
-                      }
-                    }}
-                  />
-                  <button
-                    type="button"
-                    onClick={() => {
-                      const val = fwInput.trim();
-                      if (val && !form.frameworks.includes(val)) {
-                        setForm(f => ({ ...f, frameworks: [...f.frameworks, val] }));
-                      }
-                      setFwInput('');
-                    }}
-                    className="text-sm bg-gray-900 text-white px-3 py-2 rounded-lg hover:bg-gray-700 transition-colors shrink-0"
-                  >Add</button>
-                </div>
-              </div>
-              <div>
-                <label className="block text-xs text-gray-500 mb-1">Notes</label>
-                <textarea className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-200 resize-none" rows={3} value={form.notes} onChange={e => setForm(f => ({ ...f, notes: e.target.value }))} placeholder="Scope, key focus areas, etc." />
-              </div>
             </div>
             <div className="flex justify-end gap-3 mt-6">
               <button onClick={() => setShowModal(false)} className="text-sm text-gray-500 px-4 py-2 rounded-lg hover:bg-gray-50 transition-colors">Cancel</button>

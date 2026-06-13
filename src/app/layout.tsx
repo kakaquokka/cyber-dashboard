@@ -8,7 +8,7 @@ import AuthGuard from '@/components/AuthGuard';
 const inter = Inter({ subsets: ['latin'] });
 
 export const metadata: Metadata = {
-  title: 'Cyber Advisory Dashboard',
+  title: 'KAKA Working Dashboard',
   description: 'Personal working dashboard for cybersecurity advisory work',
 };
 

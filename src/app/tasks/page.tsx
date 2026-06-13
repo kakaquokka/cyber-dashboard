@@ -107,21 +107,25 @@ export default function TasksPage() {
         {filtered.map(task => {
           const eng = engagements.find(e => e.id === task.engagementId);
           return (
-            <div key={task.id} className="flex items-center gap-3 px-4 py-3">
+            <div key={task.id} className="flex items-start gap-3 px-4 py-3">
               <button
                 onClick={() => toggleDone(task.id)}
-                className={`w-4 h-4 rounded border shrink-0 flex items-center justify-center transition-colors ${task.done ? 'bg-green-500 border-green-500' : 'border-gray-300 hover:border-green-400'}`}
+                className={`w-4 h-4 rounded border shrink-0 flex items-center justify-center transition-colors mt-0.5 ${task.done ? 'bg-green-500 border-green-500' : 'border-gray-300 hover:border-green-400'}`}
               >
                 {task.done && <span className="text-white text-[9px] font-bold leading-none">✓</span>}
               </button>
-              <div className="flex-1 min-w-0">
-                <div className={`text-sm truncate ${task.done ? 'line-through text-gray-400' : 'text-gray-800'}`}>{task.title}</div>
-                {eng && <div className="text-xs text-gray-400 mt-0.5">{eng.clientName}{eng.engagementName ? ` — ${eng.engagementName}` : ''}</div>}
+              <div className="flex-1 min-w-0 flex flex-col md:flex-row md:items-center md:gap-3">
+                <div className="flex-1 min-w-0">
+                  <div className={`text-sm ${task.done ? 'line-through text-gray-400' : 'text-gray-800'}`}>{task.title}</div>
+                  {eng && <div className="text-xs text-gray-400 mt-0.5">{eng.clientName}{eng.engagementName ? ` — ${eng.engagementName}` : ''}</div>}
+                </div>
+                <div className="flex items-center gap-2 mt-1 md:mt-0 shrink-0 flex-wrap">
+                  <span className={`text-xs font-medium ${dueDateColor(task.dueDate)}`}>{dueDateLabel(task.dueDate)}</span>
+                  <PriorityBadge priority={task.priority} />
+                  <button onClick={() => openEdit(task)} className="text-xs text-gray-300 hover:text-gray-600 transition-colors">✎</button>
+                  <button onClick={() => remove(task.id)} className="text-xs text-gray-300 hover:text-red-500 transition-colors">✕</button>
+                </div>
               </div>
-              <span className={`text-xs font-medium shrink-0 ${dueDateColor(task.dueDate)}`}>{dueDateLabel(task.dueDate)}</span>
-              <PriorityBadge priority={task.priority} />
-              <button onClick={() => openEdit(task)} className="text-xs text-gray-300 hover:text-gray-600 transition-colors ml-1">✎</button>
-              <button onClick={() => remove(task.id)} className="text-xs text-gray-300 hover:text-red-500 transition-colors ml-1">✕</button>
             </div>
           );
         })}
@@ -129,7 +133,7 @@ export default function TasksPage() {
 
       {showModal && (
         <div className="fixed inset-0 bg-black/40 flex items-end sm:items-center justify-center z-50">
-          <div className="bg-white rounded-t-2xl sm:rounded-2xl p-5 w-full sm:max-w-md shadow-xl max-h-[75vh] overflow-y-auto">
+          <div className="bg-white rounded-t-2xl sm:rounded-2xl p-5 w-full sm:max-w-md shadow-xl max-h-[60vh] overflow-y-auto">
             <h2 className="text-base font-semibold text-gray-900 mb-5">{editingTask ? 'Edit task' : 'New task'}</h2>
             <div className="space-y-4">
               <div>
@@ -146,7 +150,7 @@ export default function TasksPage() {
                     <option value="low">Low</option>
                   </select>
                 </div>
-                <div>
+                <div className="w-full min-w-0">
                   <label className="block text-xs text-gray-500 mb-1">Due date</label>
                   <input type="date" className="w-full max-w-full block border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-200" value={form.dueDate} onChange={e => setForm(f => ({ ...f, dueDate: e.target.value }))} />
                 </div>

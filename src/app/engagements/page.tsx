@@ -146,7 +146,7 @@ export default function EngagementsPage() {
       {/* Modal */}
       {showModal && (
         <div className="fixed inset-0 bg-black/40 flex items-end sm:items-center justify-center z-50">
-          <div className="bg-white rounded-t-2xl sm:rounded-2xl p-5 w-full sm:max-w-lg shadow-xl max-h-[80vh] overflow-y-auto">
+          <div className="bg-white rounded-t-2xl sm:rounded-2xl p-5 w-full sm:max-w-lg shadow-xl max-h-[60vh] overflow-y-auto">
             <h2 className="text-base font-semibold text-gray-900 mb-5">
               {editing ? 'Edit engagement' : 'New engagement'}
             </h2>
@@ -169,7 +169,7 @@ export default function EngagementsPage() {
               {/* All other fields hidden for partnership */}
               {form.phase !== 'partnership' && (
                 <>
-                  <div>
+                  <div className="w-full min-w-0">
                     <label className="block text-xs text-gray-500 mb-1">Deadline</label>
                     <input type="date" className="w-full max-w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-200 block" value={form.deadline} onChange={e => setForm(f => ({ ...f, deadline: e.target.value }))} />
                   </div>

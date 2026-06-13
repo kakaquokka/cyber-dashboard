@@ -311,7 +311,7 @@ export default function OverviewPage() {
                     <option value="low">Low</option>
                   </select>
                 </div>
-                <div>
+                <div className="w-full min-w-0">
                   <label className="block text-xs text-gray-500 mb-1">Due date</label>
                   <input type="date" className="w-full max-w-full block border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-200" value={taskForm.dueDate} onChange={e => setTaskForm(f => ({ ...f, dueDate: e.target.value }))} />
                 </div>

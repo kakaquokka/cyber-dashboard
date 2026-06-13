@@ -2,11 +2,11 @@ import { Engagement, Client, Task, Deliverable, CpdEntry } from './types';
 import { CalendarEvent } from './types';
 
 export const seedEngagements: Engagement[] = [
-  { id: 'eng-1', clientName: 'Bank A', phase: 'assessment', progress: 75, deadline: '2025-06-20', frameworks: ['ISO 27001', 'MAS TRM'], notes: 'Focus on access control and privileged accounts.' },
-  { id: 'eng-2', clientName: 'Corp B', phase: 'reporting', progress: 50, deadline: '2025-06-24', frameworks: ['ISO 27001'], notes: 'ISMS gap analysis in progress.' },
-  { id: 'eng-3', clientName: 'FinTech C', phase: 'planning', progress: 20, deadline: '2025-07-10', frameworks: ['NIST CSF', 'MAS TRM'], notes: 'Scope still being finalised with client.' },
-  { id: 'eng-4', clientName: 'Gov D', phase: 'reporting', progress: 90, deadline: '2025-06-18', frameworks: ['CSMS'], notes: 'Nearly complete — final review pending.' },
-  { id: 'eng-5', clientName: 'Retailer E', phase: 'planning', progress: 10, deadline: '2025-07-25', frameworks: ['PCI DSS', 'NIST CSF'], notes: 'Kickoff scheduled for next week.' },
+  { id: 'eng-1', clientName: 'Bank A', engagementName: 'IT Audit 2025', phase: 'assessment', progress: 75, deadline: '2025-06-20', frameworks: ['ISO 27001', 'MAS TRM'], notes: 'Focus on access control and privileged accounts.' },
+  { id: 'eng-2', clientName: 'Corp B', engagementName: 'ISO 27001 Gap Analysis', phase: 'reporting', progress: 50, deadline: '2025-06-24', frameworks: ['ISO 27001'], notes: 'ISMS gap analysis in progress.' },
+  { id: 'eng-3', clientName: 'FinTech C', engagementName: 'Penetration Test', phase: 'planning', progress: 20, deadline: '2025-07-10', frameworks: ['NIST CSF', 'MAS TRM'], notes: 'Scope still being finalised with client.' },
+  { id: 'eng-4', clientName: 'Gov D', engagementName: 'CSMS Review', phase: 'reporting', progress: 90, deadline: '2025-06-18', frameworks: ['CSMS'], notes: 'Nearly complete — final review pending.' },
+  { id: 'eng-5', clientName: 'Retailer E', engagementName: 'PCI DSS Assessment', phase: 'planning', progress: 10, deadline: '2025-07-25', frameworks: ['PCI DSS', 'NIST CSF'], notes: 'Kickoff scheduled for next week.' },
 ];
 
 export const seedClients: Client[] = [

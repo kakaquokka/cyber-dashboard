@@ -45,15 +45,15 @@ export default function CalendarPage() {
     return itemsForDay(selectedDay);
   }
 
-  function save() {
+  async function save() {
     if (!form.title.trim() || !form.date || !form.time) return;
     const newEvt: CalendarEvent = { ...form, id: `evt-${Date.now()}` };
     const updated = [...calEvents, newEvt].sort((a, b) => (a.date + a.time).localeCompare(b.date + b.time));
     setCalEvents(updated);
-    saveData('events', updated);
+    await saveData('events', updated);
     setShowModal(false);
     setForm(emptyForm);
-  }
+    }
 
   function removeEvent(id: string) {
     const updated = calEvents.filter(e => e.id !== id);

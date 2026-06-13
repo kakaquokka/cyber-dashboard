@@ -4,6 +4,7 @@ export type Phase = 'planning' | 'assessment' | 'reporting' | 'closed';
 export interface Engagement {
   id: string;
   clientName: string;
+  engagementName: string;
   phase: Phase;
   progress: number;
   deadline: string;

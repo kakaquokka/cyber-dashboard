@@ -10,7 +10,7 @@ import { format, differenceInDays } from 'date-fns';
 const phases: Phase[] = ['planning', 'assessment', 'reporting', 'closed'];
 
 const emptyForm: Omit<Engagement, 'id'> = {
-  clientName: '', phase: 'planning', progress: 0,
+  clientName: '', engagementName: '', phase: 'planning', progress: 0,
   deadline: '', frameworks: [], notes: '',
 };
 
@@ -24,7 +24,7 @@ export default function EngagementsPage() {
   useEffect(() => { loadData('engagements', seedEngagements).then(setEngagements); }, []);
 
   function openNew() { setEditing(null); setForm(emptyForm); setShowModal(true); }
-  function openEdit(e: Engagement) { setEditing(e); setForm({ clientName: e.clientName, phase: e.phase, progress: e.progress, deadline: e.deadline, frameworks: e.frameworks, notes: e.notes }); setShowModal(true); }
+  function openEdit(e: Engagement) { setEditing(e); setForm({ clientName: e.clientName, engagementName: e.engagementName, phase: e.phase, progress: e.progress, deadline: e.deadline, frameworks: e.frameworks, notes: e.notes }); setShowModal(true); }
 
   function save() {
     if (!form.clientName.trim() || !form.deadline) return;
@@ -72,8 +72,9 @@ export default function EngagementsPage() {
           return (
             <div key={eng.id} className="bg-white border border-gray-100 rounded-xl p-4">
               {/* Row 1: name + actions */}
-              <div className="flex items-start justify-between gap-2 mb-2">
+              <div className="flex items-center gap-3 mb-2">
                 <span className="text-base font-medium text-gray-900">{eng.clientName}</span>
+                {eng.engagementName && <span className="text-sm text-gray-400">{eng.engagementName}</span>}
                 <div className="flex gap-2 shrink-0">
                   <button onClick={() => openEdit(eng)} className="text-xs text-gray-400 hover:text-gray-700 px-2 py-1 rounded hover:bg-gray-50 transition-colors">Edit</button>
                   <button onClick={() => remove(eng.id)} className="text-xs text-gray-400 hover:text-red-600 px-2 py-1 rounded hover:bg-red-50 transition-colors">Remove</button>
@@ -122,6 +123,10 @@ export default function EngagementsPage() {
               <div>
                 <label className="block text-xs text-gray-500 mb-1">Client name</label>
                 <input className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-200" value={form.clientName} onChange={e => setForm(f => ({ ...f, clientName: e.target.value }))} placeholder="e.g. Bank A" />
+              </div>
+              <div>
+                <label className="block text-xs text-gray-500 mb-1">Engagement name</label>
+                <input className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-200" value={form.engagementName} onChange={e => setForm(f => ({ ...f, engagementName: e.target.value }))} placeholder="e.g. IT Audit 2025" />
               </div>
               <div className="grid grid-cols-2 gap-4">
                 <div>

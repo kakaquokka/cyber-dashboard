@@ -37,8 +37,8 @@ export default function Sidebar() {
     >
       {/* Branding */}
       <div style={{ marginBottom: '24px', paddingLeft: '8px', flexShrink: 0 }}>
-        <div className="text-white font-semibold text-sm tracking-wide">Cyber Advisory</div>
-        <div className="text-gray-500 text-xs mt-0.5">Personal dashboard</div>
+        <div className="text-white font-semibold text-sm tracking-wide">KAKA's</div>
+        <div className="text-white font-semibold text-sm tracking-wide">Working Dashboard</div>
       </div>
 
       {/* Nav links — fills middle space */}

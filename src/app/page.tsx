@@ -77,7 +77,7 @@ export default function OverviewPage() {
       <div className="mb-8">
         <h1 className="text-xl font-semibold text-gray-900">Good morning</h1>
         <p className="text-sm text-gray-500 mt-0.5">
-          {format(new Date(), 'EEEE, d MMMM yyyy')} · Week {format(new Date(), 'w')}
+          {format(new Date(), 'EEEE, d MMMM yyyy')}
         </p>
       </div>
 

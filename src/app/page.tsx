@@ -85,7 +85,15 @@ export default function OverviewPage() {
     <div className="p-4 md:p-8 max-w-6xl pb-24">
       {/* Header */}
       <div className="mb-8">
-        <h1 className="text-xl font-semibold text-gray-900">Good morning</h1>
+        <h1 className="text-xl font-semibold text-gray-900">
+          {(() => {
+            const hour = new Date().getHours();
+            if (hour >= 6 && hour < 12) return 'Good morning';
+            if (hour >= 12 && hour < 18) return 'Good afternoon';
+            if (hour >= 18) return 'Good evening';
+            return 'Good evening';
+          })()}
+        </h1>
         <p className="text-sm text-gray-500 mt-0.5">
           {format(new Date(), 'EEEE, d MMMM yyyy')}
         </p>

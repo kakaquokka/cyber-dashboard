@@ -1,5 +1,5 @@
 export type Priority = 'critical' | 'high' | 'medium' | 'low';
-export type Phase = 'planning' | 'assessment' | 'reporting' | 'closed';
+export type Phase = 'planning' | 'assessment' | 'reporting' | 'closed' | 'partnership';
 
 export interface Engagement {
   id: string;
@@ -10,6 +10,8 @@ export interface Engagement {
   deadline: string;
   frameworks: string[];
   notes: string;
+  hasPartner?: boolean;
+  partnerName?: string;
 }
 
 export interface Client {

@@ -22,7 +22,9 @@ export default function CalendarPage() {
   const [selectedDay, setSelectedDay] = useState<Date | null>(new Date());
   const [showModal, setShowModal] = useState(false);
   const [showDetail, setShowDetail] = useState<CalendarEvent | null>(null);
+  const [editingEvent, setEditingEvent] = useState<CalendarEvent | null>(null);
   const [form, setForm] = useState<Omit<CalendarEvent, 'id'>>(emptyForm);
+  const [editForm, setEditForm] = useState<Omit<CalendarEvent, 'id'>>(emptyForm);
 
   useEffect(() => {
     loadData('events', seedEvents).then(setCalEvents);
@@ -48,9 +50,11 @@ export default function CalendarPage() {
   async function save() {
     if (!form.title.trim() || !form.date || !form.time) return;
     const newEvt: CalendarEvent = { ...form, id: `evt-${Date.now()}` };
-    const updated = [...calEvents, newEvt].sort((a, b) => (a.date + a.time).localeCompare(b.date + b.time));
-    setCalEvents(updated);
-    await saveData('events', updated);
+    setCalEvents(prev => {
+        const updated = [...prev, newEvt].sort((a, b) => (a.date + a.time).localeCompare(b.date + b.time));
+        saveData('events', updated);
+        return updated;
+    });
     setShowModal(false);
     setForm(emptyForm);
     }
@@ -61,6 +65,17 @@ export default function CalendarPage() {
     deleteRow('events', id);
     setShowDetail(null);
   }
+
+  async function saveEdit() {
+    if (!editingEvent || !editForm.title.trim() || !editForm.date || !editForm.time) return;
+    const updated = calEvents.map(e =>
+        e.id === editingEvent.id ? { ...editingEvent, ...editForm } : e
+    ).sort((a, b) => (a.date + a.time).localeCompare(b.date + b.time));
+    setCalEvents(updated);
+    await saveData('events', updated);
+    setEditingEvent(null);
+    setShowDetail(null);
+    }
 
   const { dayEvents: selEvents, dayDels: selDels } = selectedDayItems();
 
@@ -233,8 +248,11 @@ export default function CalendarPage() {
               )}
             </div>
             <div className="flex justify-between mt-6">
-              <button onClick={() => removeEvent(showDetail.id)} className="text-xs text-red-400 hover:text-red-600 px-3 py-1.5 rounded hover:bg-red-50 transition-colors">Remove event</button>
-              <button onClick={() => setShowDetail(null)} className="text-sm text-gray-500 px-4 py-2 rounded-lg hover:bg-gray-50 transition-colors">Close</button>
+              <button onClick={() => removeEvent(showDetail.id)} className="text-xs text-red-400 hover:text-red-600 px-3 py-1.5 rounded hover:bg-red-50 transition-colors">Remove</button>
+              <div className="flex gap-2">
+                <button onClick={() => { setEditForm({ title: showDetail.title, date: showDetail.date, time: showDetail.time, endTime: showDetail.endTime || '', mode: showDetail.mode, meetingApp: showDetail.meetingApp || 'Teams', meetingLink: showDetail.meetingLink || '', location: showDetail.location || '', notes: showDetail.notes || '', engagementId: showDetail.engagementId || '' }); setEditingEvent(showDetail); setShowDetail(null); }} className="text-sm text-gray-500 px-4 py-2 rounded-lg hover:bg-gray-50 transition-colors">Edit</button>
+                <button onClick={() => setShowDetail(null)} className="text-sm text-gray-500 px-4 py-2 rounded-lg hover:bg-gray-50 transition-colors">Close</button>
+              </div>
             </div>
           </div>
         </div>
@@ -322,6 +340,83 @@ export default function CalendarPage() {
           </div>
         </div>
       )}
+      {editingEvent && (
+        <div className="fixed inset-0 bg-black/40 flex items-end sm:items-center justify-center z-50">
+            <div className="bg-white rounded-t-2xl sm:rounded-2xl p-5 w-full sm:max-w-lg shadow-xl max-h-[90vh] overflow-y-auto">
+            <h2 className="text-base font-semibold text-gray-900 mb-5">Edit event</h2>
+            <div className="space-y-4">
+                <div>
+                <label className="block text-xs text-gray-500 mb-1">Title</label>
+                <input className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-200" value={editForm.title} onChange={e => setEditForm(f => ({ ...f, title: e.target.value }))} />
+                </div>
+                <div className="grid grid-cols-2 gap-3">
+                <div>
+                    <label className="block text-xs text-gray-500 mb-1">Date</label>
+                    <input type="date" className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-200" value={editForm.date} onChange={e => setEditForm(f => ({ ...f, date: e.target.value }))} />
+                </div>
+                <div>
+                    <label className="block text-xs text-gray-500 mb-1">Start time</label>
+                    <input type="time" className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-200" value={editForm.time} onChange={e => setEditForm(f => ({ ...f, time: e.target.value }))} />
+                </div>
+                </div>
+                <div>
+                <label className="block text-xs text-gray-500 mb-1">End time <span className="text-gray-300">(optional)</span></label>
+                <input type="time" className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-200" value={editForm.endTime} onChange={e => setEditForm(f => ({ ...f, endTime: e.target.value }))} />
+                </div>
+                <div>
+                <label className="block text-xs text-gray-500 mb-2">Meeting type</label>
+                <div className="flex gap-2">
+                    {(['online', 'offline'] as MeetingMode[]).map(m => (
+                    <button key={m} type="button" onClick={() => setEditForm(f => ({ ...f, mode: m }))}
+                        className={`flex-1 text-sm py-2 rounded-lg border capitalize transition-colors ${editForm.mode === m ? 'bg-gray-900 text-white border-gray-900' : 'bg-gray-50 text-gray-600 border-gray-200 hover:bg-gray-100'}`}>
+                        {m === 'online' ? '💻 Online' : '📍 In person'}
+                    </button>
+                    ))}
+                </div>
+                </div>
+                {editForm.mode === 'online' ? (
+                <>
+                    <div>
+                    <label className="block text-xs text-gray-500 mb-2">Meeting app</label>
+                    <div className="flex flex-wrap gap-2">
+                        {meetingApps.map(app => (
+                        <button key={app} type="button" onClick={() => setEditForm(f => ({ ...f, meetingApp: app }))}
+                            className={`text-xs px-2.5 py-1 rounded-md border transition-colors ${editForm.meetingApp === app ? 'bg-blue-100 text-blue-800 border-blue-200' : 'bg-gray-50 text-gray-600 border-gray-200 hover:bg-gray-100'}`}>
+                            {app}
+                        </button>
+                        ))}
+                    </div>
+                    </div>
+                    <div>
+                    <label className="block text-xs text-gray-500 mb-1">Meeting link <span className="text-gray-300">(optional)</span></label>
+                    <input className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-200" value={editForm.meetingLink} onChange={e => setEditForm(f => ({ ...f, meetingLink: e.target.value }))} placeholder="https://..." />
+                    </div>
+                </>
+                ) : (
+                <div>
+                    <label className="block text-xs text-gray-500 mb-1">Location</label>
+                    <input className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-200" value={editForm.location} onChange={e => setEditForm(f => ({ ...f, location: e.target.value }))} placeholder="e.g. Client HQ, Level 12" />
+                </div>
+                )}
+                <div>
+                <label className="block text-xs text-gray-500 mb-1">Linked engagement <span className="text-gray-300">(optional)</span></label>
+                <select className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-200" value={editForm.engagementId} onChange={e => setEditForm(f => ({ ...f, engagementId: e.target.value }))}>
+                    <option value="">— none —</option>
+                    {engagements.map(e => <option key={e.id} value={e.id}>{e.clientName}</option>)}
+                </select>
+                </div>
+                <div>
+                <label className="block text-xs text-gray-500 mb-1">Notes <span className="text-gray-300">(optional)</span></label>
+                <textarea className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-200 resize-none" rows={2} value={editForm.notes} onChange={e => setEditForm(f => ({ ...f, notes: e.target.value }))} />
+                </div>
+            </div>
+            <div className="flex justify-end gap-3 mt-6">
+                <button onClick={() => setEditingEvent(null)} className="text-sm text-gray-500 px-4 py-2 rounded-lg hover:bg-gray-50">Cancel</button>
+                <button onClick={saveEdit} className="text-sm bg-gray-900 text-white px-4 py-2 rounded-lg hover:bg-gray-700">Save</button>
+            </div>
+            </div>
+        </div>
+        )}
     </div>
   );
 }

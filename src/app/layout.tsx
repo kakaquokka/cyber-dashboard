@@ -43,11 +43,10 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
           {/* Scrollable content — offset by sidebar width */}
           <div
             style={{
-              marginLeft: '208px',
               height: '100vh',
               overflowY: 'auto',
             }}
-            className="max-md:ml-0 max-md:pt-12"
+            className="flex-1 md:ml-[208px] pt-0 md:pt-0"
           >
             <main>{children}</main>
           </div>

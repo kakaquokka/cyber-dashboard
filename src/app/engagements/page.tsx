@@ -7,11 +7,11 @@ import { seedEngagements } from '@/lib/seeds';
 import { PhaseBadge } from '@/components/Badge';
 import { format, differenceInDays } from 'date-fns';
 
-const phases: Phase[] = ['planning', 'assessment', 'reporting', 'closed'];
+const phases: Phase[] = ['planning', 'assessment', 'reporting', 'closed', 'partnership'];
 
 const emptyForm: Omit<Engagement, 'id'> = {
   clientName: '', engagementName: '', phase: 'planning', progress: 0,
-  deadline: '', frameworks: [], notes: '',
+  deadline: '', frameworks: [], notes: '', hasPartner: false, partnerName: '',
 };
 
 export default function EngagementsPage() {
@@ -90,6 +90,9 @@ export default function EngagementsPage() {
               </div>
 
               {/* Notes */}
+              {eng.hasPartner && eng.partnerName && (
+                    <p className="text-xs text-purple-600 mb-1">Partner: {eng.partnerName}</p>
+              )}
               {eng.notes && <p className="text-sm text-gray-400 mb-3 truncate">{eng.notes}</p>}
 
               {/* Row 3: progress bar */}
@@ -128,22 +131,42 @@ export default function EngagementsPage() {
                 <label className="block text-xs text-gray-500 mb-1">Engagement name</label>
                 <input className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-200" value={form.engagementName} onChange={e => setForm(f => ({ ...f, engagementName: e.target.value }))} placeholder="e.g. IT Audit 2025" />
               </div>
-              <div className="grid grid-cols-2 gap-4">
-                <div>
-                  <label className="block text-xs text-gray-500 mb-1">Phase</label>
-                  <select className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-200" value={form.phase} onChange={e => setForm(f => ({ ...f, phase: e.target.value as Phase }))}>
-                    {phases.map(p => <option key={p} value={p}>{p.charAt(0).toUpperCase() + p.slice(1)}</option>)}
-                  </select>
-                </div>
-                <div>
-                  <label className="block text-xs text-gray-500 mb-1">Deadline</label>
-                  <input type="date" className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-200" value={form.deadline} onChange={e => setForm(f => ({ ...f, deadline: e.target.value }))} />
-                </div>
-              </div>
               <div>
-                <label className="block text-xs text-gray-500 mb-1">Progress — {form.progress}%</label>
-                <input type="range" min={0} max={100} step={5} className="w-full" value={form.progress} onChange={e => setForm(f => ({ ...f, progress: Number(e.target.value) }))} />
+                <label className="block text-xs text-gray-500 mb-1">Phase</label>
+                <select className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-200" value={form.phase} onChange={e => setForm(f => ({ ...f, phase: e.target.value as Phase }))}>
+                  {phases.map(p => <option key={p} value={p}>{p.charAt(0).toUpperCase() + p.slice(1)}</option>)}
+                </select>
               </div>
+              {form.phase !== 'partnership' && (
+                <>
+                  <div>
+                    <label className="block text-xs text-gray-500 mb-1">Deadline</label>
+                    <input type="date" className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-200" value={form.deadline} onChange={e => setForm(f => ({ ...f, deadline: e.target.value }))} />
+                  </div>
+                  <div>
+                    <label className="block text-xs text-gray-500 mb-1">Progress — {form.progress}%</label>
+                    <input type="range" min={0} max={100} step={5} className="w-full" value={form.progress} onChange={e => setForm(f => ({ ...f, progress: Number(e.target.value) }))} />
+                  </div>
+                </>
+              )}
+              <div>
+                <label className="block text-xs text-gray-500 mb-2">Partnership</label>
+                <div className="flex gap-2">
+                  {[true, false].map(val => (
+                    <button key={String(val)} type="button"
+                      onClick={() => setForm(f => ({ ...f, hasPartner: val, partnerName: val ? f.partnerName : '' }))}
+                      className={`flex-1 text-sm py-2 rounded-lg border transition-colors ${form.hasPartner === val ? 'bg-gray-900 text-white border-gray-900' : 'bg-gray-50 text-gray-600 border-gray-200 hover:bg-gray-100'}`}>
+                      {val ? 'Yes' : 'No'}
+                    </button>
+                  ))}
+                </div>
+              </div>
+              {form.hasPartner && (
+                <div>
+                  <label className="block text-xs text-gray-500 mb-1">Partner name</label>
+                  <input className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-200" value={form.partnerName} onChange={e => setForm(f => ({ ...f, partnerName: e.target.value }))} placeholder="e.g. Deloitte" />
+                </div>
+              )}
               <div>
                 <label className="block text-xs text-gray-500 mb-2">Frameworks</label>
                 <div className="flex flex-wrap gap-2 mb-2">

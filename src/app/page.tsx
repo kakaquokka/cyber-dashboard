@@ -2,8 +2,8 @@
 
 import { useEffect, useState } from 'react';
 import { loadData, saveData } from '@/lib/storage';
-import { Engagement, Client, Task, Deliverable, CpdEntry } from '@/lib/types';
-import { seedEngagements, seedClients, seedTasks, seedDeliverables, seedCpd } from '@/lib/seeds';
+import { Engagement, Task, Deliverable, CpdEntry } from '@/lib/types';
+import { seedEngagements, seedTasks, seedDeliverables, seedCpd } from '@/lib/seeds';
 import { PriorityBadge } from '@/components/Badge';
 import { format, isToday, isTomorrow, differenceInDays } from 'date-fns';
 import { CalendarEvent } from '@/lib/types';
@@ -39,22 +39,22 @@ const avatarColors = [
 
 export default function OverviewPage() {
   const [engagements, setEngagements] = useState<Engagement[]>([]);
-  const [clients, setClients] = useState<Client[]>([]);
   const [tasks, setTasks] = useState<Task[]>([]);
   const [deliverables, setDeliverables] = useState<Deliverable[]>([]);
   const [cpd, setCpd] = useState<CpdEntry[]>([]);
   const [calEvents, setCalEvents] = useState<CalendarEvent[]>([]);
+  const [showTaskModal, setShowTaskModal] = useState(false);
+  const [taskForm, setTaskForm] = useState({ title: '', priority: 'medium' as Task['priority'], dueDate: '', engagementId: '' });
 
   useEffect(() => {
     loadData('engagements', seedEngagements).then(setEngagements);
-    loadData('clients', seedClients).then(setClients);
     loadData('tasks', seedTasks).then(setTasks);
     loadData('deliverables', seedDeliverables).then(setDeliverables);
     loadData('cpd', seedCpd).then(setCpd);
     loadData('events', seedEvents).then(setCalEvents);
   }, []);
 
-  const activeEngagements = engagements.filter(e => e.phase !== 'closed');
+  const activeEngagements = engagements.filter(e => e.phase !== 'closed' && e.phase !== 'partnership');
   const pendingTasks = tasks.filter(t => !t.done).sort((a, b) => {
     const order = { critical: 0, high: 1, medium: 2, low: 3 };
     return order[a.priority] - order[b.priority];
@@ -69,6 +69,16 @@ export default function OverviewPage() {
     const updated = tasks.map(t => t.id === id ? { ...t, done: !t.done } : t);
     setTasks(updated);
     saveData('tasks', updated);
+  }
+
+  async function addTask() {
+    if (!taskForm.title.trim() || !taskForm.dueDate) return;
+    const newTask: Task = { ...taskForm, id: `task-${Date.now()}`, done: false };
+    const updated = [...tasks, newTask];
+    setTasks(updated);
+    await saveData('tasks', updated);
+    setShowTaskModal(false);
+    setTaskForm({ title: '', priority: 'medium', dueDate: '', engagementId: '' });
   }
 
   return (
@@ -149,12 +159,19 @@ export default function OverviewPage() {
       </div>
 
       {/* Tasks + Clients */}
-      <div className="grid grid-cols-1 md:grid-cols-5 gap-6 mb-6">
-        {/* Priority tasks */}
-        <div className="md:col-span-3 bg-white border border-gray-100 rounded-xl p-5">
-          <h2 className="text-sm font-medium text-gray-500 mb-4">Priority tasks</h2>
+      <div className="grid grid-cols-1 gap-6 mb-6">
+        <div className="bg-white border border-gray-100 rounded-xl p-5">
+          <div className="flex items-center justify-between mb-4">
+            <h2 className="text-sm font-medium text-gray-500">Priority tasks</h2>
+            <button
+              onClick={() => setShowTaskModal(true)}
+              className="text-xs text-gray-400 hover:text-gray-700 px-2 py-1 rounded hover:bg-gray-50 transition-colors"
+            >
+              + Add task
+            </button>
+          </div>
           {pendingTasks.length === 0 && (
-            <p className="text-sm text-gray-400">All tasks done. Nice work.</p>
+            <p className="text-sm text-gray-400">No open tasks. Add one to get started.</p>
           )}
           <ul className="space-y-0 divide-y divide-gray-50">
             {pendingTasks.slice(0, 6).map(task => {
@@ -175,24 +192,6 @@ export default function OverviewPage() {
                 </li>
               );
             })}
-          </ul>
-        </div>
-
-        {/* Client contacts */}
-        <div className="md:col-span-2 bg-white border border-gray-100 rounded-xl p-5">
-          <h2 className="text-sm font-medium text-gray-500 mb-4">Client contacts</h2>
-          <ul className="space-y-0 divide-y divide-gray-50">
-            {clients.slice(0, 4).map((c, i) => (
-              <li key={c.id} className="flex items-center gap-3 py-2.5">
-                <div className={`w-8 h-8 rounded-full flex items-center justify-center text-xs font-semibold shrink-0 ${avatarColors[i % avatarColors.length]}`}>
-                  {initials(c.name)}
-                </div>
-                <div className="flex-1 min-w-0">
-                  <div className="text-sm font-medium text-gray-800 truncate">{c.name}</div>
-                  <div className="text-xs text-gray-400 truncate">{c.company} · {c.role}</div>
-                </div>
-              </li>
-            ))}
           </ul>
         </div>
       </div>
@@ -281,6 +280,47 @@ export default function OverviewPage() {
           </div>
         </div>
       </div>
+    
+      {showTaskModal && (
+        <div className="fixed inset-0 bg-black/40 flex items-end sm:items-center justify-center z-50">
+          <div className="bg-white rounded-t-2xl sm:rounded-2xl p-5 w-full sm:max-w-md shadow-xl">
+            <h2 className="text-base font-semibold text-gray-900 mb-5">New task</h2>
+            <div className="space-y-4">
+              <div>
+                <label className="block text-xs text-gray-500 mb-1">Task</label>
+                <input className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-200" value={taskForm.title} onChange={e => setTaskForm(f => ({ ...f, title: e.target.value }))} placeholder="e.g. Finalise access control findings" />
+              </div>
+              <div className="grid grid-cols-2 gap-3">
+                <div>
+                  <label className="block text-xs text-gray-500 mb-1">Priority</label>
+                  <select className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-200" value={taskForm.priority} onChange={e => setTaskForm(f => ({ ...f, priority: e.target.value as Task['priority'] }))}>
+                    <option value="critical">Critical</option>
+                    <option value="high">High</option>
+                    <option value="medium">Medium</option>
+                    <option value="low">Low</option>
+                  </select>
+                </div>
+                <div>
+                  <label className="block text-xs text-gray-500 mb-1">Due date</label>
+                  <input type="date" className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-200" value={taskForm.dueDate} onChange={e => setTaskForm(f => ({ ...f, dueDate: e.target.value }))} />
+                </div>
+              </div>
+              <div>
+                <label className="block text-xs text-gray-500 mb-1">Linked engagement <span className="text-gray-300">(optional)</span></label>
+                <select className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-200" value={taskForm.engagementId} onChange={e => setTaskForm(f => ({ ...f, engagementId: e.target.value }))}>
+                  <option value="">— none —</option>
+                  {engagements.map(e => <option key={e.id} value={e.id}>{e.clientName}{e.engagementName ? ` — ${e.engagementName}` : ''}</option>)}
+                </select>
+              </div>
+            </div>
+            <div className="flex justify-end gap-3 mt-6">
+              <button onClick={() => setShowTaskModal(false)} className="text-sm text-gray-500 px-4 py-2 rounded-lg hover:bg-gray-50">Cancel</button>
+              <button onClick={addTask} className="text-sm bg-gray-900 text-white px-4 py-2 rounded-lg hover:bg-gray-700">Save</button>
+            </div>
+          </div>
+        </div>
+      )}
+    
     </div>
   );
 }

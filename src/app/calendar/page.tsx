@@ -198,7 +198,7 @@ export default function CalendarPage() {
       {/* Event detail popup */}
       {showDetail && (
         <div className="fixed inset-0 bg-black/40 flex items-end sm:items-center justify-center z-50">
-          <div className="bg-white rounded-t-2xl sm:rounded-2xl p-5 w-full sm:max-w-md shadow-xl max-h-[90vh] overflow-y-auto">
+          <div className="bg-white rounded-t-2xl sm:rounded-2xl p-5 w-full sm:max-w-md shadow-xl max-h-[80vh] overflow-y-auto">
             <div className="flex items-start justify-between mb-4">
               <h2 className="text-base font-semibold text-gray-900 pr-4">{showDetail.title}</h2>
               <button onClick={() => setShowDetail(null)} className="text-gray-400 hover:text-gray-600 shrink-0">✕</button>
@@ -268,14 +268,14 @@ export default function CalendarPage() {
                 <label className="block text-xs text-gray-500 mb-1">Title</label>
                 <input className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-200" value={form.title} onChange={e => setForm(f => ({ ...f, title: e.target.value }))} placeholder="e.g. Bank A Kickoff" />
               </div>
-              <div className="grid grid-cols-2 gap-3">
+              <div className="flex flex-col gap-3">
                 <div>
                   <label className="block text-xs text-gray-500 mb-1">Date</label>
-                  <input type="date" className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-200" value={form.date} onChange={e => setForm(f => ({ ...f, date: e.target.value }))} />
+                  <input type="date" className="w-full max-w-full block border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-200" value={form.date} onChange={e => setForm(f => ({ ...f, date: e.target.value }))} />
                 </div>
                 <div>
                   <label className="block text-xs text-gray-500 mb-1">Start time</label>
-                  <input type="time" className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-200" value={form.time} onChange={e => setForm(f => ({ ...f, time: e.target.value }))} />
+                  <input type="time" className="w-full max-w-full block border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-200" value={form.time} onChange={e => setForm(f => ({ ...f, time: e.target.value }))} />
                 </div>
               </div>
               <div>
@@ -349,15 +349,15 @@ export default function CalendarPage() {
                 <label className="block text-xs text-gray-500 mb-1">Title</label>
                 <input className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-200" value={editForm.title} onChange={e => setEditForm(f => ({ ...f, title: e.target.value }))} />
                 </div>
-                <div className="grid grid-cols-2 gap-3">
-                <div>
+                <div className="flex flex-col gap-3">
+                  <div>
                     <label className="block text-xs text-gray-500 mb-1">Date</label>
-                    <input type="date" className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-200" value={editForm.date} onChange={e => setEditForm(f => ({ ...f, date: e.target.value }))} />
-                </div>
-                <div>
+                    <input type="date" className="w-full max-w-full block border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-200" value={form.date} onChange={e => setForm(f => ({ ...f, date: e.target.value }))} />
+                  </div>
+                  <div>
                     <label className="block text-xs text-gray-500 mb-1">Start time</label>
-                    <input type="time" className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-200" value={editForm.time} onChange={e => setEditForm(f => ({ ...f, time: e.target.value }))} />
-                </div>
+                    <input type="time" className="w-full max-w-full block border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-200" value={form.time} onChange={e => setForm(f => ({ ...f, time: e.target.value }))} />
+                  </div>
                 </div>
                 <div>
                 <label className="block text-xs text-gray-500 mb-1">End time <span className="text-gray-300">(optional)</span></label>

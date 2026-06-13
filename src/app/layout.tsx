@@ -17,22 +17,15 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
     <html lang="en">
       <body className={`${inter.className} bg-gray-50 text-gray-900`} style={{ margin: 0, padding: 0 }}>
         <AuthGuard>
-          {/* Fixed sidebar — completely outside document flow */}
+          {/* Fixed sidebar — desktop only */}
           <div
             className="hidden md:flex"
-            style={{
-              position: 'fixed',
-              top: 0,
-              left: 0,
-              width: '208px',
-              height: '100vh',
-              zIndex: 50,
-            }}
+            style={{ position: 'fixed', top: 0, left: 0, width: '208px', height: '100vh', zIndex: 50 }}
           >
             <Sidebar />
           </div>
 
-          {/* Mobile top nav */}
+          {/* Fixed mobile top nav */}
           <div
             className="md:hidden"
             style={{ position: 'fixed', top: 0, left: 0, right: 0, zIndex: 50 }}
@@ -40,13 +33,10 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
             <MobileNav />
           </div>
 
-          {/* Scrollable content — offset by sidebar width */}
+          {/* Scrollable content */}
           <div
-            style={{
-              height: '100vh',
-              overflowY: 'auto',
-            }}
-            className="flex-1 md:ml-[208px] pt-0 md:pt-0"
+            style={{ height: '100vh', overflowY: 'auto' }}
+            className="md:ml-[208px] pt-[48px] md:pt-0"
           >
             <main>{children}</main>
           </div>

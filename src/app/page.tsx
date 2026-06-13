@@ -183,18 +183,23 @@ export default function OverviewPage() {
             {pendingTasks.slice(0, 6).map(task => {
               const eng = engagements.find(e => e.id === task.engagementId);
               return (
-                <li key={task.id} className="flex items-center gap-3 py-2.5">
+                <li key={task.id} className="flex items-start gap-3 py-2.5">
                   <button
                     onClick={() => toggleTask(task.id)}
-                    className="w-4 h-4 rounded border border-gray-300 hover:border-blue-400 shrink-0 flex items-center justify-center transition-colors"
+                    className="w-4 h-4 rounded border border-gray-300 hover:border-blue-400 shrink-0 flex items-center justify-center transition-colors mt-0.5"
                     aria-label={`Mark "${task.title}" as done`}
                   />
-                  <span className="flex-1 text-sm text-gray-800 truncate">{task.title}</span>
-                  {eng && <span className="text-xs text-gray-400 shrink-0">{eng.clientName}</span>}
-                  <span className={`text-xs shrink-0 font-medium ${dueDateColor(task.dueDate)}`}>
-                    {dueDateLabel(task.dueDate)}
-                  </span>
-                  <PriorityBadge priority={task.priority} />
+                  {/* Mobile: stacked. Desktop: single row */}
+                  <div className="flex-1 min-w-0 flex flex-col md:flex-row md:items-center md:gap-3">
+                    <span className="text-sm text-gray-800 flex-1 md:truncate">{task.title}</span>
+                    <div className="flex items-center gap-2 mt-1 md:mt-0 flex-wrap md:flex-nowrap shrink-0">
+                      {eng && <span className="text-xs text-gray-400">{eng.clientName}</span>}
+                      <span className={`text-xs font-medium ${dueDateColor(task.dueDate)}`}>
+                        {dueDateLabel(task.dueDate)}
+                      </span>
+                      <PriorityBadge priority={task.priority} />
+                    </div>
+                  </div>
                 </li>
               );
             })}

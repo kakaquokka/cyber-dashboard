@@ -125,7 +125,7 @@ export default function ConnectionsPage() {
               {eng && (
                 <div className="flex items-center gap-2 text-xs text-gray-400">
                   <span>◈</span>
-                  <span>{eng.clientName}{eng.engagementName ? ` — ${eng.engagementName}` : ''}</span>
+                  <span>{eng.clientName}</span>
                 </div>
               )}
             </div>
@@ -256,7 +256,7 @@ export default function ConnectionsPage() {
                     <label className="block text-xs text-gray-500 mb-1">Linked engagement</label>
                     <select className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-200" value={form.engagementId} onChange={e => setForm(f => ({ ...f, engagementId: e.target.value }))}>
                       <option value="">— none —</option>
-                      {engagements.map(e => <option key={e.id} value={e.id}>{e.clientName}{e.engagementName ? ` — ${e.engagementName}` : ''}</option>)}
+                      {engagements.map(e => <option key={e.id} value={e.id}>{e.clientName}</option>)}
                     </select>
                   </div>
                 </>

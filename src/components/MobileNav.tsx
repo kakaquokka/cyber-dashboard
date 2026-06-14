@@ -7,7 +7,7 @@ const navItems = [
   { href: '/engagements', label: 'Engagements' },
   { href: '/tasks', label: 'Tasks' },
   { href: '/deliverables', label: 'Deliverables' },
-  { href: '/clients', label: 'Clients' },
+  { href: '/connections', label: 'Connections' },
   { href: '/cpd', label: 'CPD' },
   { href: '/calendar', label: 'Calendar' },
 ];

@@ -14,14 +14,21 @@ export interface Engagement {
   partnerName?: string;
 }
 
-export interface Client {
+export type ConnectionType = 'client' | 'colleague';
+export type ClientStatus = 'engaging' | 'engaged' | 'potential';
+export type ColleagueStatus = 'current' | 'past';
+
+export interface Connection {
   id: string;
   name: string;
   role: string;
   email: string;
   phone?: string;
-  engagementId: string;
   company: string;
+  type: ConnectionType;
+  clientStatus?: ClientStatus;
+  colleagueStatus?: ColleagueStatus;
+  engagementId?: string;
 }
 
 export interface Task {

@@ -42,6 +42,20 @@ export default function CalendarPage() {
     return { dayEvents, dayDels };
   }
 
+  function formatDateInput(value: string): string {
+    const digits = value.replace(/\D/g, '').slice(0, 8);
+    if (digits.length <= 4) return digits;
+    if (digits.length <= 6) return `${digits.slice(0, 4)}-${digits.slice(4)}`;
+    return `${digits.slice(0, 4)}-${digits.slice(4, 6)}-${digits.slice(6)}`;
+    }
+
+  function formatTimeInput(value: string): string {
+    const digits = value.replace(/\D/g, '').slice(0, 4);
+    if (digits.length <= 2) return digits;
+    return `${digits.slice(0, 2)}:${digits.slice(2)}`;
+    }
+    
+
   function selectedDayItems() {
     if (!selectedDay) return { dayEvents: [], dayDels: [] };
     return itemsForDay(selectedDay);
@@ -276,7 +290,7 @@ export default function CalendarPage() {
                     placeholder="YYYY-MM-DD"
                     className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-200"
                     value={form.date}
-                    onChange={e => setForm(f => ({ ...f, date: e.target.value }))}
+                    onChange={e => setForm(f => ({ ...f, date: formatDateInput(e.target.value) }))}
                     />
                 </div>
                 <div className="w-full min-w-0">
@@ -286,7 +300,7 @@ export default function CalendarPage() {
                     placeholder="HH:MM"
                     className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-200"
                     value={form.time}
-                    onChange={e => setForm(f => ({ ...f, time: e.target.value }))}
+                    onChange={e => setForm(f => ({ ...f, time: formatTimeInput(e.target.value) }))}
                     />
                 </div>
               </div>
@@ -297,7 +311,7 @@ export default function CalendarPage() {
                     placeholder="HH:MM"
                     className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-200"
                     value={form.endTime}
-                    onChange={e => setForm(f => ({ ...f, endTime: e.target.value }))}
+                    onChange={e => setForm(f => ({ ...f, endTime: formatTimeInput(e.target.value) }))}
                     />
               </div>
 
@@ -374,7 +388,7 @@ export default function CalendarPage() {
                         placeholder="YYYY-MM-DD"
                         className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-200"
                         value={editForm.date}
-                        onChange={e => setEditForm(f => ({ ...f, date: e.target.value }))}
+                        onChange={e => setEditForm(f => ({ ...f, date: formatDateInput(e.target.value) }))}
                         />
                 </div>
                 <div>
@@ -384,7 +398,7 @@ export default function CalendarPage() {
                         placeholder="HH:MM"
                         className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-200"
                         value={editForm.time}
-                        onChange={e => setEditForm(f => ({ ...f, time: e.target.value }))}
+                        onChange={e => setEditForm(f => ({ ...f, time: formatTimeInput(e.target.value) }))}
                         />
                 </div>
                 <div>
@@ -394,7 +408,7 @@ export default function CalendarPage() {
                         placeholder="HH:MM"
                         className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-200"
                         value={editForm.endTime}
-                        onChange={e => setEditForm(f => ({ ...f, endTime: e.target.value }))}
+                        onChange={e => setEditForm(f => ({ ...f, endTime: formatTimeInput(e.target.value) }))}
                         />
                 </div>
                 <div>

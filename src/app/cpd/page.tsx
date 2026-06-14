@@ -36,6 +36,13 @@ export default function CpdPage() {
     cat, hours: entries.filter(e => e.category === cat).reduce((s, e) => s + e.hours, 0),
   })).filter(c => c.hours > 0);
 
+  function formatDateInput(value: string): string {
+    const digits = value.replace(/\D/g, '').slice(0, 8);
+    if (digits.length <= 4) return digits;
+    if (digits.length <= 6) return `${digits.slice(0, 4)}-${digits.slice(4)}`;
+    return `${digits.slice(0, 4)}-${digits.slice(4, 6)}-${digits.slice(6)}`;
+  }
+
   function save() {
     if (!form.title.trim() || !form.date || form.hours <= 0) return;
     const updated = [...entries, { ...form, id: `cpd-${Date.now()}` }].sort((a, b) => b.date.localeCompare(a.date));
@@ -128,7 +135,7 @@ export default function CpdPage() {
                     placeholder="YYYY-MM-DD"
                     className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-200"
                     value={form.date}
-                    onChange={e => setForm(f => ({ ...f, date: e.target.value }))}
+                    onChange={e => setForm(f => ({ ...f, date: formatDateInput(e.target.value) }))}
                   />
                 </div>
                 <div>

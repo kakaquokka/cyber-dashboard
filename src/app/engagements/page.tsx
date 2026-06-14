@@ -25,6 +25,13 @@ export default function EngagementsPage() {
 
   function openNew() { setEditing(null); setForm(emptyForm); setFwInput(''); setShowModal(true); }
 
+  function formatDateInput(value: string): string {
+    const digits = value.replace(/\D/g, '').slice(0, 8);
+    if (digits.length <= 4) return digits;
+    if (digits.length <= 6) return `${digits.slice(0, 4)}-${digits.slice(4)}`;
+    return `${digits.slice(0, 4)}-${digits.slice(4, 6)}-${digits.slice(6)}`;
+  }
+
   function openEdit(e: Engagement) {
     setEditing(e);
     setForm({
@@ -176,7 +183,7 @@ export default function EngagementsPage() {
                       placeholder="YYYY-MM-DD"
                       className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-200"
                       value={form.deadline}
-                      onChange={e => setForm(f => ({ ...f, deadline: e.target.value }))}
+                      onChange={e => setForm(f => ({ ...f, deadline: formatDateInput(e.target.value) }))}
                     />
                   </div>
                   <div>

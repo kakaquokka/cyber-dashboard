@@ -39,6 +39,13 @@ export default function DeliverablesPage() {
     setEditForm({ title: d.title, dueDate: d.dueDate, engagementId: d.engagementId });
   }
 
+  function formatDateInput(value: string): string {
+    const digits = value.replace(/\D/g, '').slice(0, 8);
+    if (digits.length <= 4) return digits;
+    if (digits.length <= 6) return `${digits.slice(0, 4)}-${digits.slice(4)}`;
+    return `${digits.slice(0, 4)}-${digits.slice(4, 6)}-${digits.slice(6)}`;
+  }
+
   async function saveEdit() {
     if (!editingDel || !editForm.title.trim() || !editForm.dueDate) return;
     const updated = deliverables.map(d =>
@@ -219,7 +226,7 @@ export default function DeliverablesPage() {
                   placeholder="YYYY-MM-DD"
                   className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-200"
                   value={form.dueDate}
-                  onChange={e => setForm(f => ({ ...f, dueDate: e.target.value }))}
+                  onChange={e => setForm(f => ({ ...f, dueDate: formatDateInput(e.target.value) }))}
                 />
               </div>
               <div>
@@ -253,7 +260,7 @@ export default function DeliverablesPage() {
                   placeholder="YYYY-MM-DD"
                   className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-200"
                   value={editForm.dueDate}
-                  onChange={e => setEditForm(f => ({ ...f, dueDate: e.target.value }))}
+                  onChange={e => setEditForm(f => ({ ...f, dueDate: formatDateInput(e.target.value) }))}
                 />
               </div>
               <div>

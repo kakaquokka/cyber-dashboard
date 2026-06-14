@@ -65,6 +65,13 @@ export default function OverviewPage() {
     .filter(e => e.phase !== 'closed' && differenceInDays(new Date(e.deadline), new Date()) <= 7)
     .length;
 
+  function formatDateInput(value: string): string {
+    const digits = value.replace(/\D/g, '').slice(0, 8);
+    if (digits.length <= 4) return digits;
+    if (digits.length <= 6) return `${digits.slice(0, 4)}-${digits.slice(4)}`;
+    return `${digits.slice(0, 4)}-${digits.slice(4, 6)}-${digits.slice(6)}`;
+  }
+
   async function toggleTask(id: string) {
     const updated = tasks.map(t => t.id === id ? { ...t, done: !t.done } : t);
     setTasks(updated);
@@ -318,7 +325,7 @@ export default function OverviewPage() {
                       placeholder="YYYY-MM-DD"
                       className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-200"
                       value={taskForm.dueDate}
-                      onChange={e => setTaskForm(f => ({ ...f, dueDate: e.target.value }))}
+                      onChange={e => setTaskForm(f => ({ ...f, dueDate: formatDateInput(e.target.value) }))}
                     />
                 </div>
               </div>

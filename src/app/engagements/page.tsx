@@ -173,10 +173,7 @@ export default function EngagementsPage() {
                     <label className="block text-xs text-gray-500 mb-1">Deadline</label>
                     <input
                       type="text"
-                      inputMode="none"
                       placeholder="YYYY-MM-DD"
-                      onFocus={e => { (e.target as HTMLInputElement).type = 'date'; }}
-                      onBlur={e => { if (!(e.target as HTMLInputElement).value) (e.target as HTMLInputElement).type = 'text'; }}
                       className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-200"
                       value={form.deadline}
                       onChange={e => setForm(f => ({ ...f, deadline: e.target.value }))}

@@ -22,7 +22,7 @@ export default function LoginPage() {
     <div className="min-h-screen bg-gray-950 flex items-center justify-center p-4">
       <div className="bg-white rounded-2xl p-8 w-full max-w-sm shadow-xl">
         <div className="mb-6">
-          <h1 className="text-lg font-semibold text-gray-900">Cyber Advisory Dashboard</h1>
+          <h1 className="text-lg font-semibold text-gray-900">KAKA's Working Dashboard</h1>
           <p className="text-sm text-gray-400 mt-1">Enter your password to continue.</p>
         </div>
         <form onSubmit={handleSubmit} className="space-y-4">

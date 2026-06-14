@@ -313,16 +313,13 @@ export default function OverviewPage() {
                 </div>
                 <div className="w-full min-w-0">
                   <label className="block text-xs text-gray-500 mb-1">Due date</label>
-                  <input
-                    type="text"
-                    inputMode="none"
-                    placeholder="YYYY-MM-DD"
-                    onFocus={e => { (e.target as HTMLInputElement).type = 'date'; }}
-                    onBlur={e => { if (!(e.target as HTMLInputElement).value) (e.target as HTMLInputElement).type = 'text'; }}
-                    className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-200"
-                    value={taskForm.dueDate}
-                    onChange={e => setTaskForm(f => ({ ...f, dueDate: e.target.value }))}
-                  />
+                    <input
+                      type="text"
+                      placeholder="YYYY-MM-DD"
+                      className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-200"
+                      value={taskForm.dueDate}
+                      onChange={e => setTaskForm(f => ({ ...f, dueDate: e.target.value }))}
+                    />
                 </div>
               </div>
               <div>

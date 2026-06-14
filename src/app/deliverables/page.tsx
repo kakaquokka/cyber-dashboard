@@ -215,15 +215,12 @@ export default function DeliverablesPage() {
               <div className="w-full min-w-0">
                 <label className="block text-xs text-gray-500 mb-1">Due date</label>
                 <input
-                type="text"
-                inputMode="none"
-                placeholder="YYYY-MM-DD"
-                onFocus={e => { (e.target as HTMLInputElement).type = 'date'; }}
-                onBlur={e => { if (!(e.target as HTMLInputElement).value) (e.target as HTMLInputElement).type = 'text'; }}
-                className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-200"
-                value={form.dueDate}
-                onChange={e => setForm(f => ({ ...f, dueDate: e.target.value }))}
-              />
+                  type="text"
+                  placeholder="YYYY-MM-DD"
+                  className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-200"
+                  value={form.dueDate}
+                  onChange={e => setForm(f => ({ ...f, dueDate: e.target.value }))}
+                />
               </div>
               <div>
                 <label className="block text-xs text-gray-500 mb-1">Engagement</label>
@@ -252,15 +249,12 @@ export default function DeliverablesPage() {
               <div>
                 <label className="block text-xs text-gray-500 mb-1">Due date</label>
                 <input
-                type="text"
-                inputMode="none"
-                placeholder="YYYY-MM-DD"
-                onFocus={e => { (e.target as HTMLInputElement).type = 'date'; }}
-                onBlur={e => { if (!(e.target as HTMLInputElement).value) (e.target as HTMLInputElement).type = 'text'; }}
-                className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-200"
-                value={form.dueDate}
-                onChange={e => setForm(f => ({ ...f, dueDate: e.target.value }))}
-              />
+                  type="text"
+                  placeholder="YYYY-MM-DD"
+                  className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-200"
+                  value={editForm.dueDate}
+                  onChange={e => setEditForm(f => ({ ...f, dueDate: e.target.value }))}
+                />
               </div>
               <div>
                 <label className="block text-xs text-gray-500 mb-1">Engagement</label>

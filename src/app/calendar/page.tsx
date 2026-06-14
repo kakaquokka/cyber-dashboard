@@ -273,10 +273,7 @@ export default function CalendarPage() {
                   <label className="block text-xs text-gray-500 mb-1">Date</label>
                   <input
                     type="text"
-                    inputMode="none"
                     placeholder="YYYY-MM-DD"
-                    onFocus={e => { (e.target as HTMLInputElement).type = 'date'; }}
-                    onBlur={e => { if (!(e.target as HTMLInputElement).value) (e.target as HTMLInputElement).type = 'text'; }}
                     className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-200"
                     value={form.date}
                     onChange={e => setForm(f => ({ ...f, date: e.target.value }))}
@@ -286,10 +283,7 @@ export default function CalendarPage() {
                   <label className="block text-xs text-gray-500 mb-1">Start time</label>
                   <input
                     type="text"
-                    inputMode="none"
                     placeholder="HH:MM"
-                    onFocus={e => { (e.target as HTMLInputElement).type = 'time'; }}
-                    onBlur={e => { if (!(e.target as HTMLInputElement).value) (e.target as HTMLInputElement).type = 'text'; }}
                     className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-200"
                     value={form.time}
                     onChange={e => setForm(f => ({ ...f, time: e.target.value }))}
@@ -299,15 +293,12 @@ export default function CalendarPage() {
               <div className="w-full min-w-0">
                 <label className="block text-xs text-gray-500 mb-1">End time <span className="text-gray-300">(optional)</span></label>
                 <input
-                  type="text"
-                  inputMode="none"
-                  placeholder="HH:MM"
-                  onFocus={e => { (e.target as HTMLInputElement).type = 'time'; }}
-                  onBlur={e => { if (!(e.target as HTMLInputElement).value) (e.target as HTMLInputElement).type = 'text'; }}
-                  className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-200"
-                  value={form.endTime}
-                  onChange={e => setForm(f => ({ ...f, endTime: e.target.value }))}
-                />
+                    type="text"
+                    placeholder="HH:MM"
+                    className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-200"
+                    value={form.endTime}
+                    onChange={e => setForm(f => ({ ...f, endTime: e.target.value }))}
+                    />
               </div>
 
               {/* Online / Offline toggle */}
@@ -380,40 +371,31 @@ export default function CalendarPage() {
                     <label className="block text-xs text-gray-500 mb-1">Date</label>
                     <input
                         type="text"
-                        inputMode="none"
                         placeholder="YYYY-MM-DD"
-                        onFocus={e => { (e.target as HTMLInputElement).type = 'date'; }}
-                        onBlur={e => { if (!(e.target as HTMLInputElement).value) (e.target as HTMLInputElement).type = 'text'; }}
                         className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-200"
                         value={editForm.date}
                         onChange={e => setEditForm(f => ({ ...f, date: e.target.value }))}
-                    />
+                        />
                 </div>
                 <div>
                     <label className="block text-xs text-gray-500 mb-1">Start time</label>
                     <input
                         type="text"
-                        inputMode="none"
                         placeholder="HH:MM"
-                        onFocus={e => { (e.target as HTMLInputElement).type = 'time'; }}
-                        onBlur={e => { if (!(e.target as HTMLInputElement).value) (e.target as HTMLInputElement).type = 'text'; }}
                         className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-200"
                         value={editForm.time}
                         onChange={e => setEditForm(f => ({ ...f, time: e.target.value }))}
-                    />
+                        />
                 </div>
                 <div>
                     <label className="block text-xs text-gray-500 mb-1">End time <span className="text-gray-300">(optional)</span></label>
                     <input
                         type="text"
-                        inputMode="none"
                         placeholder="HH:MM"
-                        onFocus={e => { (e.target as HTMLInputElement).type = 'time'; }}
-                        onBlur={e => { if (!(e.target as HTMLInputElement).value) (e.target as HTMLInputElement).type = 'text'; }}
                         className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-200"
                         value={editForm.endTime}
                         onChange={e => setEditForm(f => ({ ...f, endTime: e.target.value }))}
-                    />
+                        />
                 </div>
                 <div>
                 <label className="block text-xs text-gray-500 mb-2">Meeting type</label>

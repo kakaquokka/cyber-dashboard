@@ -15,15 +15,16 @@ export interface Engagement {
 }
 
 export type ConnectionType = 'client' | 'colleague';
-export type ClientStatus = 'engaging' | 'engaged' | 'potential';
+export type ClientStatus = 'engaging' | 'potential';
 export type ColleagueStatus = 'current' | 'past';
 
 export interface Connection {
   id: string;
   name: string;
-  role: string;
-  email: string;
-  phone?: string;
+  role?: string;
+  email?: string;
+  companyPhone?: string;
+  mobilePhone?: string;
   company: string;
   type: ConnectionType;
   clientStatus?: ClientStatus;
@@ -54,7 +55,7 @@ export interface CpdEntry {
   provider: string;
   date: string;
   hours: number;
-  category: 'course' | 'webinar' | 'conference' | 'self-study' | 'workshop';
+  category: string;
 }
 
 export type MeetingMode = 'online' | 'offline';

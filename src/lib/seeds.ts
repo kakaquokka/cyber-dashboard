@@ -10,11 +10,11 @@ export const seedEngagements: Engagement[] = [
 ];
 
 export const seedConnections: Connection[] = [
-  { id: 'cli-1', name: 'Tanaka Noboru', role: 'IT Audit Lead', email: 't.noboru@banka.co.jp', phone: '+81 3-1234-5678', engagementId: 'eng-1', company: 'Bank A', type: 'client', clientStatus: 'engaging' },
-  { id: 'cli-2', name: 'Sarah Lim', role: 'CISO', email: 's.lim@corpb.com', phone: '+65 9123 4567', engagementId: 'eng-2', company: 'Corp B', type: 'client', clientStatus: 'engaging' },
-  { id: 'cli-3', name: 'Raj Kumar', role: 'Head of Compliance', email: 'r.kumar@fintechc.io', phone: '+65 8234 5678', engagementId: 'eng-3', company: 'FinTech C', type: 'client', clientStatus: 'engaged' },
-  { id: 'cli-4', name: 'Miyamoto Kenji', role: 'Security Manager', email: 'm.kenji@govd.go.jp', phone: '+81 3-9876-5432', engagementId: 'eng-4', company: 'Gov D', type: 'client', clientStatus: 'engaged' },
-  { id: 'cli-5', name: 'Jennifer Tan', role: 'Head of IT', email: 'j.tan@retailere.com', phone: '+65 9345 6789', engagementId: 'eng-5', company: 'Retailer E', type: 'client', clientStatus: 'potential' },
+  { id: 'cli-1', name: 'Tanaka Noboru', role: 'IT Audit Lead', email: 't.noboru@banka.co.jp', mobilePhone: '+81 3-1234-5678', engagementId: 'eng-1', company: 'Bank A', type: 'client', clientStatus: 'engaging' },
+  { id: 'cli-2', name: 'Sarah Lim', role: 'CISO', email: 's.lim@corpb.com', mobilePhone: '+65 9123 4567', engagementId: 'eng-2', company: 'Corp B', type: 'client', clientStatus: 'engaging' },
+  { id: 'cli-3', name: 'Raj Kumar', role: 'Head of Compliance', email: 'r.kumar@fintechc.io', mobilePhone: '+65 8234 5678', engagementId: 'eng-3', company: 'FinTech C', type: 'client', clientStatus: 'engaging' },
+  { id: 'cli-4', name: 'Miyamoto Kenji', role: 'Security Manager', email: 'm.kenji@govd.go.jp', mobilePhone: '+81 3-9876-5432', engagementId: 'eng-4', company: 'Gov D', type: 'client', clientStatus: 'engaging' },
+  { id: 'cli-5', name: 'Jennifer Tan', role: 'Head of IT', email: 'j.tan@retailere.com', mobilePhone: '+65 9345 6789', engagementId: 'eng-5', company: 'Retailer E', type: 'client', clientStatus: 'potential' },
 ];
 
 export const seedTasks: Task[] = [

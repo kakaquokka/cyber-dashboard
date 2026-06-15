@@ -8,15 +8,16 @@ import { format } from 'date-fns';
 
 const CPD_TARGET = 40;
 
-const categoryColors: Record<CpdEntry['category'], string> = {
+const categoryColors: Record<string, string> = {
   course: 'bg-blue-100 text-blue-800',
   webinar: 'bg-purple-100 text-purple-800',
   conference: 'bg-amber-100 text-amber-800',
   'self-study': 'bg-green-100 text-green-800',
   workshop: 'bg-teal-100 text-teal-800',
 };
+const defaultCategoryColor = 'bg-gray-100 text-gray-600';
 
-const categories: CpdEntry['category'][] = ['course', 'webinar', 'conference', 'self-study', 'workshop'];
+const presetCategories = ['course', 'webinar', 'conference', 'self-study', 'workshop'];
 
 const emptyForm: Omit<CpdEntry, 'id'> = {
   title: '', provider: '', date: '', hours: 1, category: 'webinar',
@@ -26,13 +27,15 @@ export default function CpdPage() {
   const [entries, setEntries] = useState<CpdEntry[]>([]);
   const [showModal, setShowModal] = useState(false);
   const [form, setForm] = useState<Omit<CpdEntry, 'id'>>(emptyForm);
+  const [customCategory, setCustomCategory] = useState('');
+  const [showCustomInput, setShowCustomInput] = useState(false);
 
   useEffect(() => { loadData('cpd', seedCpd).then(setEntries); }, []);
 
   const totalHours = entries.reduce((s, e) => s + e.hours, 0);
   const pct = Math.min(Math.round((totalHours / CPD_TARGET) * 100), 100);
 
-  const byCategory = categories.map(cat => ({
+  const byCategory = presetCategories.map(cat => ({
     cat, hours: entries.filter(e => e.category === cat).reduce((s, e) => s + e.hours, 0),
   })).filter(c => c.hours > 0);
 
@@ -84,7 +87,7 @@ export default function CpdPage() {
         </div>
         <div className="flex flex-wrap gap-3">
           {byCategory.map(({ cat, hours }) => (
-            <span key={cat} className={`text-xs font-medium px-2.5 py-1 rounded-md capitalize ${categoryColors[cat]}`}>
+            <span key={cat} className={`text-xs font-medium px-2.5 py-1 rounded-md capitalize ${categoryColors[cat] || defaultCategoryColor}`}>
               {cat}: {hours}h
             </span>
           ))}
@@ -105,7 +108,7 @@ export default function CpdPage() {
               <div className="text-sm font-medium text-gray-800">{entry.title}</div>
               <div className="text-xs text-gray-400 mt-0.5">{entry.provider} · {format(new Date(entry.date), 'd MMM yyyy')}</div>
             </div>
-            <span className={`text-xs font-medium px-2.5 py-1 rounded-md capitalize shrink-0 ${categoryColors[entry.category]}`}>
+            <span className={`text-xs font-medium px-2.5 py-1 rounded-md capitalize shrink-0 ${categoryColors[entry.category] || defaultCategoryColor}`}>
               {entry.category}
             </span>
             <button onClick={() => remove(entry.id)} className="text-xs text-gray-300 hover:text-red-500 transition-colors" aria-label="Remove entry">✕</button>
@@ -145,13 +148,24 @@ export default function CpdPage() {
               </div>
               <div>
                 <label className="block text-xs text-gray-500 mb-2">Category</label>
-                <div className="flex flex-wrap gap-2">
-                  {categories.map(cat => (
-                    <button key={cat} onClick={() => setForm(f => ({ ...f, category: cat }))} className={`text-xs px-2.5 py-1 rounded-md border capitalize transition-colors ${form.category === cat ? categoryColors[cat] + ' border-transparent' : 'bg-gray-50 text-gray-600 border-gray-200 hover:bg-gray-100'}`}>
+                <div className="flex flex-wrap gap-2 mb-2">
+                  {presetCategories.map(cat => (
+                    <button key={cat} type="button" onClick={() => { setForm(f => ({ ...f, category: cat })); setShowCustomInput(false); }} className={`text-xs px-2.5 py-1 rounded-md border capitalize transition-colors ${form.category === cat ? (categoryColors[cat] || defaultCategoryColor) + ' border-transparent' : 'bg-gray-50 text-gray-600 border-gray-200 hover:bg-gray-100'}`}>
                       {cat}
                     </button>
                   ))}
+                  <button type="button" onClick={() => setShowCustomInput(true)} className={`text-xs px-2.5 py-1 rounded-md border transition-colors ${showCustomInput || !presetCategories.includes(form.category) ? 'bg-gray-900 text-white border-gray-900' : 'bg-gray-50 text-gray-600 border-gray-200 hover:bg-gray-100'}`}>
+                    Other
+                  </button>
                 </div>
+                {(showCustomInput || !presetCategories.includes(form.category)) && (
+                  <input
+                    className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-200"
+                    placeholder="e.g. Internal training"
+                    value={customCategory || (!presetCategories.includes(form.category) ? form.category : '')}
+                    onChange={e => { setCustomCategory(e.target.value); setForm(f => ({ ...f, category: e.target.value })); }}
+                  />
+                )}
               </div>
             </div>
             <div className="flex justify-end gap-3 mt-6">

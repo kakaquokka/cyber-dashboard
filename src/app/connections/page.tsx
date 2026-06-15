@@ -17,7 +17,6 @@ function initials(name: string) {
 
 const clientStatusStyles: Record<ClientStatus, string> = {
   engaging: 'bg-blue-100 text-blue-800',
-  engaged: 'bg-green-100 text-green-800',
   potential: 'bg-amber-100 text-amber-800',
 };
 
@@ -27,7 +26,7 @@ const colleagueStatusStyles: Record<ColleagueStatus, string> = {
 };
 
 const emptyForm: Omit<Connection, 'id'> = {
-  name: '', role: '', email: '', phone: '', company: '',
+  name: '', role: '', email: '', companyPhone: '', mobilePhone: '', company: '',
   type: 'client', clientStatus: 'engaging', colleagueStatus: 'current', engagementId: '',
 };
 
@@ -48,7 +47,7 @@ export default function ConnectionsPage() {
   const filtered = connections.filter(c => {
     const matchesSearch = c.name.toLowerCase().includes(search.toLowerCase()) ||
       c.company.toLowerCase().includes(search.toLowerCase()) ||
-      c.role.toLowerCase().includes(search.toLowerCase());
+      (c.role?.toLowerCase().includes(search.toLowerCase()) ?? false);
     const matchesFilter = filter === 'all' ? true : c.type === filter;
     return matchesSearch && matchesFilter;
   });
@@ -56,9 +55,9 @@ export default function ConnectionsPage() {
   // Group clients by status
   const clientGroups: { label: string; status: ClientStatus }[] = [
     { label: 'Engaging', status: 'engaging' },
-    { label: 'Engaged', status: 'engaged' },
     { label: 'Potential', status: 'potential' },
   ];
+
   const colleagueGroups: { label: string; status: ColleagueStatus }[] = [
     { label: 'Current colleagues', status: 'current' },
     { label: 'Past colleagues', status: 'past' },
@@ -68,7 +67,8 @@ export default function ConnectionsPage() {
   function openEdit(c: Connection) {
     setEditing(c);
     setForm({
-      name: c.name, role: c.role, email: c.email, phone: c.phone || '', company: c.company,
+      name: c.name, role: c.role || '', email: c.email || '',
+      companyPhone: c.companyPhone || '', mobilePhone: c.mobilePhone || '', company: c.company,
       type: c.type, clientStatus: c.clientStatus || 'engaging', colleagueStatus: c.colleagueStatus || 'current',
       engagementId: c.engagementId || '',
     });
@@ -76,7 +76,7 @@ export default function ConnectionsPage() {
   }
 
   async function save() {
-    if (!form.name.trim() || !form.email.trim()) return;
+    if (!form.name.trim() || !form.company.trim()) return;
     let updated: Connection[];
     if (editing) {
       updated = connections.map(c => c.id === editing.id ? { ...editing, ...form } : c);
@@ -114,12 +114,19 @@ export default function ConnectionsPage() {
             <div className="text-xs text-gray-500 mt-0.5">{c.company} · {c.role}</div>
 
             <div className="mt-3 space-y-1.5">
-              <a href={`mailto:${c.email}`} className="flex items-center gap-2 text-xs text-blue-600 hover:underline">
-                <span className="text-gray-400">✉</span> {c.email}
-              </a>
-              {c.phone && (
-                <a href={`tel:${c.phone}`} className="flex items-center gap-2 text-xs text-gray-600 hover:text-gray-900">
-                  <span className="text-gray-400">✆</span> {c.phone}
+              {c.email && (
+                <a href={`mailto:${c.email}`} className="flex items-center gap-2 text-xs text-blue-600 hover:underline">
+                  <span className="text-gray-400">✉</span> {c.email}
+                </a>
+              )}
+              {c.companyPhone && (
+                <a href={`tel:${c.companyPhone}`} className="flex items-center gap-2 text-xs text-gray-600 hover:text-gray-900">
+                  <span className="text-gray-400">☎</span> {c.companyPhone} <span className="text-gray-300">(office)</span>
+                </a>
+              )}
+              {c.mobilePhone && (
+                <a href={`tel:${c.mobilePhone}`} className="flex items-center gap-2 text-xs text-gray-600 hover:text-gray-900">
+                  <span className="text-gray-400">✆</span> {c.mobilePhone} <span className="text-gray-300">(mobile)</span>
                 </a>
               )}
               {eng && (
@@ -222,14 +229,15 @@ export default function ConnectionsPage() {
               </div>
 
               {[
-                { label: 'Full name', key: 'name', placeholder: 'e.g. Tanaka Noboru' },
-                { label: 'Company', key: 'company', placeholder: 'e.g. Bank A' },
-                { label: 'Role', key: 'role', placeholder: 'e.g. IT Audit Lead' },
-                { label: 'Email', key: 'email', placeholder: 'name@company.com' },
-                { label: 'Phone', key: 'phone', placeholder: '+81 3-1234-5678' },
-              ].map(({ label, key, placeholder }) => (
+                { label: 'Full name', key: 'name', placeholder: 'e.g. Tanaka Noboru', required: true },
+                { label: 'Company', key: 'company', placeholder: 'e.g. Bank A', required: true },
+                { label: 'Role', key: 'role', placeholder: 'e.g. IT Audit Lead', required: false },
+                { label: 'Email', key: 'email', placeholder: 'name@company.com', required: false },
+                { label: 'Company phone', key: 'companyPhone', placeholder: '+81 3-1234-5678', required: false },
+                { label: 'Mobile phone', key: 'mobilePhone', placeholder: '+81 90-1234-5678', required: false },
+              ].map(({ label, key, placeholder, required }) => (
                 <div key={key}>
-                  <label className="block text-xs text-gray-500 mb-1">{label}</label>
+                  <label className="block text-xs text-gray-500 mb-1">{label}{!required && <span className="text-gray-300"> (optional)</span>}</label>
                   <input
                     className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-200"
                     value={(form as Record<string, string>)[key]}
@@ -244,7 +252,7 @@ export default function ConnectionsPage() {
                   <div>
                     <label className="block text-xs text-gray-500 mb-2">Status</label>
                     <div className="flex gap-2">
-                      {(['engaging', 'engaged', 'potential'] as ClientStatus[]).map(s => (
+                      {(['engaging', 'potential'] as ClientStatus[]).map(s => (
                         <button key={s} type="button" onClick={() => setForm(f => ({ ...f, clientStatus: s }))}
                           className={`flex-1 text-xs px-2 py-2 rounded-lg border capitalize transition-colors ${form.clientStatus === s ? 'bg-gray-900 text-white border-gray-900' : 'bg-gray-50 text-gray-600 border-gray-200 hover:bg-gray-100'}`}>
                           {s}

@@ -2,8 +2,8 @@
 
 import { useEffect, useState } from 'react';
 import { loadData, saveData } from '@/lib/storage';
-import { Engagement, Task, Deliverable, CpdEntry } from '@/lib/types';
-import { seedEngagements, seedTasks, seedDeliverables, seedCpd } from '@/lib/seeds';
+import { Engagement, Task, Deliverable } from '@/lib/types';
+import { seedEngagements, seedTasks, seedDeliverables } from '@/lib/seeds';
 import { PriorityBadge } from '@/components/Badge';
 import { format, isToday, isTomorrow, differenceInDays } from 'date-fns';
 import { CalendarEvent } from '@/lib/types';
@@ -38,10 +38,10 @@ const avatarColors = [
 ];
 
 export default function OverviewPage() {
+  const [miniCalOffset, setMiniCalOffset] = useState(0);
   const [engagements, setEngagements] = useState<Engagement[]>([]);
   const [tasks, setTasks] = useState<Task[]>([]);
   const [deliverables, setDeliverables] = useState<Deliverable[]>([]);
-  const [cpd, setCpd] = useState<CpdEntry[]>([]);
   const [calEvents, setCalEvents] = useState<CalendarEvent[]>([]);
   const [showTaskModal, setShowTaskModal] = useState(false);
   const [taskForm, setTaskForm] = useState({ title: '', priority: 'medium' as Task['priority'], dueDate: '', engagementId: '' });
@@ -50,7 +50,6 @@ export default function OverviewPage() {
     loadData('engagements', seedEngagements).then(setEngagements);
     loadData('tasks', seedTasks).then(setTasks);
     loadData('deliverables', seedDeliverables).then(setDeliverables);
-    loadData('cpd', seedCpd).then(setCpd);
     loadData('events', seedEvents).then(setCalEvents);
   }, []);
 
@@ -60,7 +59,6 @@ export default function OverviewPage() {
     return order[a.priority] - order[b.priority];
   });
   const doneDeliverables = deliverables.filter(d => d.done).length;
-  const cpdTotal = cpd.reduce((s, c) => s + c.hours, 0);
   const upcomingDeadlines = engagements
     .filter(e => e.phase !== 'closed' && differenceInDays(new Date(e.deadline), new Date()) <= 7)
     .length;
@@ -156,6 +154,36 @@ export default function OverviewPage() {
           </div>
         );
       })()}
+
+      {/* Mini two-week calendar */}
+      <div className="bg-white border border-gray-100 rounded-xl p-4 mb-6">
+        <div className="flex items-center justify-between mb-3">
+          <button onClick={() => setMiniCalOffset(o => o - 14)} className="text-gray-400 hover:text-gray-700 px-2 py-1 rounded hover:bg-gray-100 transition-colors">‹</button>
+          <h2 className="text-sm font-medium text-gray-500">
+            {format(new Date(Date.now() + miniCalOffset * 86400000), 'd MMM')} – {format(new Date(Date.now() + (miniCalOffset + 13) * 86400000), 'd MMM')}
+          </h2>
+          <button onClick={() => setMiniCalOffset(o => o + 14)} className="text-gray-400 hover:text-gray-700 px-2 py-1 rounded hover:bg-gray-100 transition-colors">›</button>
+        </div>
+        <div className="grid grid-cols-7 gap-1">
+          {Array.from({ length: 14 }).map((_, i) => {
+            const day = new Date(Date.now() + (miniCalOffset + i) * 86400000);
+            const dateStr = format(day, 'yyyy-MM-dd');
+            const dayEvents = calEvents.filter(e => e.date === dateStr);
+            const dayDels = deliverables.filter(d => !d.done && d.dueDate === dateStr);
+            const today = isToday(day);
+            return (
+              <a key={i} href="/calendar" className={`flex flex-col items-center py-2 rounded-lg transition-colors ${today ? 'bg-blue-50' : 'hover:bg-gray-50'}`}>
+                <span className="text-[10px] text-gray-400">{format(day, 'EEE')}</span>
+                <span className={`text-sm font-medium mt-0.5 ${today ? 'text-blue-600' : 'text-gray-700'}`}>{format(day, 'd')}</span>
+                <div className="flex gap-0.5 mt-1 h-1.5">
+                  {dayEvents.length > 0 && <span className="w-1.5 h-1.5 rounded-full bg-blue-400" />}
+                  {dayDels.length > 0 && <span className="w-1.5 h-1.5 rounded-full bg-red-400" />}
+                </div>
+              </a>
+            );
+          })}
+        </div>
+      </div>
 
       {/* Metric cards */}
       <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
@@ -270,34 +298,6 @@ export default function OverviewPage() {
         </div>
       </div>
 
-      {/* CPD strip */}
-      <div className="bg-white border border-gray-100 rounded-xl p-5 mb-6">
-        <div className="flex items-center justify-between mb-4">
-          <h2 className="text-sm font-medium text-gray-500">CPD — {new Date().getFullYear()}</h2>
-          <span className="text-xs text-gray-400">{cpdTotal} / 40 hrs · {Math.round((cpdTotal / 40) * 100)}% of annual target</span>
-        </div>
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-4 items-center">
-          {cpd.slice(0, 3).map(entry => (
-            <div key={entry.id} className="bg-gray-50 rounded-lg p-3">
-              <div className="text-xs text-gray-400 capitalize mb-1">{entry.category}</div>
-              <div className="text-sm font-medium text-gray-800 truncate">{entry.title}</div>
-              <div className="text-xs text-gray-400 mt-1">{entry.hours} hrs · {format(new Date(entry.date), 'd MMM yyyy')}</div>
-            </div>
-          ))}
-          <div>
-            <div className="flex justify-between text-xs text-gray-500 mb-1.5">
-              <span>Annual target</span>
-              <span>{cpdTotal} / 40 hrs</span>
-            </div>
-            <div className="h-2 bg-gray-100 rounded-full overflow-hidden">
-              <div
-                className="h-full bg-purple-400 rounded-full transition-all"
-                style={{ width: `${Math.min((cpdTotal / 40) * 100, 100)}%` }}
-              />
-            </div>
-          </div>
-        </div>
-      </div>
     
       {showTaskModal && (
         <div className="fixed inset-0 bg-black/40 flex items-end sm:items-center justify-center z-50">
@@ -333,7 +333,7 @@ export default function OverviewPage() {
                 <label className="block text-xs text-gray-500 mb-1">Linked engagement <span className="text-gray-300">(optional)</span></label>
                 <select className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-200" value={taskForm.engagementId} onChange={e => setTaskForm(f => ({ ...f, engagementId: e.target.value }))}>
                   <option value="">— none —</option>
-                  {engagements.map(e => <option key={e.id} value={e.id}>{e.clientName}{e.engagementName ? ` — ${e.engagementName}` : ''}</option>)}
+                  {engagements.filter(e => e.phase !== 'closed').map(e => <option key={e.id} value={e.id}>{e.clientName}{e.engagementName ? ` — ${e.engagementName}` : ''}</option>)}
                 </select>
               </div>
             </div>

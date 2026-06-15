@@ -43,7 +43,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
           {/* Scrollable content */}
           <div
             style={{ height: '100vh', overflowY: 'auto' }}
-            className="md:ml-[208px] pt-[48px] md:pt-0"
+            className="md:ml-[208px] pt-[56px] md:pt-0"
           >
             <main>{children}</main>
           </div>

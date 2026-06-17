@@ -8,6 +8,8 @@ import { PriorityBadge } from '@/components/Badge';
 import { format, isToday, isTomorrow, differenceInDays } from 'date-fns';
 import { CalendarEvent } from '@/lib/types';
 import { seedEvents } from '@/lib/seeds';
+import { LeaveRecord } from '@/lib/types';
+import { seedLeaveRecords } from '@/lib/seeds';
 
 function dueDateLabel(dateStr: string): string {
   const d = new Date(dateStr);
@@ -45,12 +47,14 @@ export default function OverviewPage() {
   const [calEvents, setCalEvents] = useState<CalendarEvent[]>([]);
   const [showTaskModal, setShowTaskModal] = useState(false);
   const [taskForm, setTaskForm] = useState({ title: '', priority: 'medium' as Task['priority'], dueDate: '', engagementId: '' });
+  const [leaveRecords, setLeaveRecords] = useState<LeaveRecord[]>([]);
 
   useEffect(() => {
     loadData('engagements', seedEngagements).then(setEngagements);
     loadData('tasks', seedTasks).then(setTasks);
     loadData('deliverables', seedDeliverables).then(setDeliverables);
     loadData('events', seedEvents).then(setCalEvents);
+    loadData('leave_records', seedLeaveRecords).then(setLeaveRecords);
   }, []);
 
   const activeEngagements = engagements.filter(e => e.phase !== 'closed' && e.phase !== 'partnership');
@@ -116,8 +120,11 @@ export default function OverviewPage() {
         const upcomingDels = deliverables
           .filter(d => !d.done && d.dueDate >= todayStr && new Date(d.dueDate) <= in7)
           .sort((a, b) => a.dueDate.localeCompare(b.dueDate));
+        const upcomingLeave = leaveRecords
+          .filter(r => r.endDate >= todayStr && new Date(r.startDate) <= in7)
+          .sort((a, b) => a.startDate.localeCompare(b.startDate));
 
-        if (upcoming.length === 0 && upcomingDels.length === 0) return null;
+        if (upcoming.length === 0 && upcomingDels.length === 0 && upcomingLeave.length === 0) return null;
 
         return (
           <div className="bg-blue-50 border border-blue-100 rounded-xl p-4 mb-6">
@@ -150,6 +157,20 @@ export default function OverviewPage() {
                   </div>
                 );
               })}
+              {upcomingLeave.map(r => (
+                <div key={r.id} className="flex items-center gap-3 py-1">
+                  <span className="w-2 h-2 rounded-full bg-green-400 shrink-0" />
+                  <div className="flex-1 min-w-0">
+                    <span className="text-sm text-gray-800">{r.type} leave</span>
+                    {r.notes && <span className="text-xs text-gray-400 ml-2">· {r.notes}</span>}
+                  </div>
+                  <span className="text-xs text-blue-500 shrink-0 font-medium">
+                    {r.startDate === r.endDate
+                      ? format(new Date(r.startDate), 'd MMM')
+                      : `${format(new Date(r.startDate), 'd MMM')} – ${format(new Date(r.endDate), 'd MMM')}`}
+                  </span>
+                </div>
+              ))}
             </div>
           </div>
         );

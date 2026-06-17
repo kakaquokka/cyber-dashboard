@@ -12,6 +12,7 @@ const navItems = [
   { href: '/connections', label: 'Connections', icon: '◎' },
   { href: '/cpd', label: 'CPD log', icon: '◇' },
   { href: '/calendar', label: 'Calendar', icon: '◫' },
+  { href: '/leave', label: 'Leave', icon: '◑' },
 ];
 
 export default function Sidebar() {

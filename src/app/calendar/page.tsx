@@ -6,6 +6,15 @@ import { CalendarEvent, Engagement, Deliverable, MeetingApp, MeetingMode } from 
 import { seedEvents, seedEngagements, seedDeliverables } from '@/lib/seeds';
 import { format, startOfMonth, endOfMonth, eachDayOfInterval, isSameDay,
          isToday, getDay, addMonths, subMonths } from 'date-fns';
+import { LeaveRecord } from '@/lib/types';
+import { seedLeaveRecords } from '@/lib/seeds';
+
+const leaveColors: Record<string, string> = {
+  AL: 'bg-blue-100 text-blue-800',
+  BL: 'bg-pink-100 text-pink-800',
+  NPL: 'bg-gray-100 text-gray-600',
+  CL: 'bg-amber-100 text-amber-800',
+};
 
 const meetingApps: MeetingApp[] = ['Zoom', 'Teams', 'Google Meet', 'Webex', 'Other'];
 
@@ -25,11 +34,13 @@ export default function CalendarPage() {
   const [editingEvent, setEditingEvent] = useState<CalendarEvent | null>(null);
   const [form, setForm] = useState<Omit<CalendarEvent, 'id'>>(emptyForm);
   const [editForm, setEditForm] = useState<Omit<CalendarEvent, 'id'>>(emptyForm);
+  const [leaveRecords, setLeaveRecords] = useState<LeaveRecord[]>([]);
 
   useEffect(() => {
     loadData('events', seedEvents).then(setCalEvents);
     loadData('deliverables', seedDeliverables).then(setDeliverables);
     loadData('engagements', seedEngagements).then(setEngagements);
+    loadData('leave_records', seedLeaveRecords).then(setLeaveRecords);
   }, []);
 
   const days = eachDayOfInterval({ start: startOfMonth(currentMonth), end: endOfMonth(currentMonth) });
@@ -39,7 +50,8 @@ export default function CalendarPage() {
     const dateStr = format(day, 'yyyy-MM-dd');
     const dayEvents = calEvents.filter(e => e.date === dateStr);
     const dayDels = deliverables.filter(d => d.dueDate === dateStr && !d.done);
-    return { dayEvents, dayDels };
+    const dayLeave = leaveRecords.filter(r => r.startDate <= dateStr && r.endDate >= dateStr);
+    return { dayEvents, dayDels, dayLeave };
   }
 
   function formatDateInput(value: string): string {
@@ -128,8 +140,8 @@ export default function CalendarPage() {
             <div key={`pad-${i}`} className="h-12 md:h-16 border-b border-r border-gray-50" />
           ))}
           {days.map(day => {
-            const { dayEvents, dayDels } = itemsForDay(day);
-            const hasItems = dayEvents.length > 0 || dayDels.length > 0;
+            const { dayEvents, dayDels, dayLeave } = itemsForDay(day);
+            const hasItems = dayEvents.length > 0 || dayDels.length > 0 || dayLeave.length > 0;
             const selected = selectedDay && isSameDay(day, selectedDay);
             const today = isToday(day);
             return (
@@ -142,12 +154,17 @@ export default function CalendarPage() {
                 <span className={`text-xs font-medium ${selected ? 'text-white' : today ? 'text-blue-600' : 'text-gray-700'}`}>
                   {format(day, 'd')}
                 </span>
-                {hasItems && (
-                  <div className="flex gap-0.5">
-                    {dayEvents.length > 0 && <span className="w-1 h-1 rounded-full bg-blue-400" />}
-                    {dayDels.length > 0 && <span className="w-1 h-1 rounded-full bg-red-400" />}
-                  </div>
-                )}
+                {(() => {
+                  const { dayEvents: de, dayDels: dd, dayLeave: dl } = itemsForDay(day);
+                  const has = de.length > 0 || dd.length > 0 || dl.length > 0;
+                  return has ? (
+                    <div className="flex gap-0.5">
+                      {de.length > 0 && <span className="w-1 h-1 rounded-full bg-blue-400" />}
+                      {dd.length > 0 && <span className="w-1 h-1 rounded-full bg-red-400" />}
+                      {dl.length > 0 && <span className="w-1 h-1 rounded-full bg-green-400" />}
+                    </div>
+                  ) : null;
+                })()}
               </button>
             );
           })}
@@ -158,6 +175,7 @@ export default function CalendarPage() {
       <div className="flex gap-4 mb-4 text-xs text-gray-400">
         <span className="flex items-center gap-1.5"><span className="w-2 h-2 rounded-full bg-blue-400 inline-block" />Meeting / event</span>
         <span className="flex items-center gap-1.5"><span className="w-2 h-2 rounded-full bg-red-400 inline-block" />Deliverable due</span>
+        <span className="flex items-center gap-1.5"><span className="w-2 h-2 rounded-full bg-green-400 inline-block" />Leave</span>
       </div>
 
       {/* Selected day panel */}
@@ -186,6 +204,24 @@ export default function CalendarPage() {
               })}
             </div>
           )}
+
+          {(() => {
+            const { dayLeave } = itemsForDay(selectedDay);
+            if (dayLeave.length === 0) return null;
+            return (
+              <div className="mt-3">
+                <div className="text-xs text-gray-400 uppercase tracking-wider mb-2">Leave</div>
+                {dayLeave.map(r => (
+                  <div key={r.id} className="flex items-center gap-2 py-1.5 text-sm">
+                    <span className="w-2 h-2 rounded-full bg-green-400 shrink-0" />
+                    <span className={`text-xs font-semibold px-1.5 py-0.5 rounded ${leaveColors[r.type] || 'bg-purple-100 text-purple-800'}`}>{r.type}</span>
+                    <span className="text-gray-800">{r.days} day{r.days !== 1 ? 's' : ''}</span>
+                    {r.notes && <span className="text-xs text-gray-400">· {r.notes}</span>}
+                  </div>
+                ))}
+              </div>
+            );
+          })()}
 
           {selEvents.length > 0 && (
             <div>

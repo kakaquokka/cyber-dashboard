@@ -74,3 +74,22 @@ export interface CalendarEvent {
   notes?: string;
   engagementId?: string;
 }
+
+export type LeaveType = 'AL' | 'BL' | 'NPL' | 'CL' | string;
+
+export interface LeaveBalance {
+  id: string;
+  year: number;
+  type: LeaveType;
+  entitled: number;
+  used: number;
+}
+
+export interface LeaveRecord {
+  id: string;
+  type: LeaveType;
+  startDate: string;
+  endDate: string;
+  days: number;
+  notes?: string;
+}

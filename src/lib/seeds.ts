@@ -66,3 +66,14 @@ export const seedEvents: CalendarEvent[] = [
     notes: 'Bring printed draft report.',
   },
 ];
+
+import { LeaveBalance, LeaveRecord } from './types';
+
+export const seedLeaveBalances: LeaveBalance[] = [
+  { id: 'lb-al', year: new Date().getFullYear(), type: 'AL', entitled: 14, used: 0 },
+  { id: 'lb-bl', year: new Date().getFullYear(), type: 'BL', entitled: 1, used: 0 },
+  { id: 'lb-npl', year: new Date().getFullYear(), type: 'NPL', entitled: 0, used: 0 },
+  { id: 'lb-cl', year: new Date().getFullYear(), type: 'CL', entitled: 0, used: 0 },
+];
+
+export const seedLeaveRecords: LeaveRecord[] = [];

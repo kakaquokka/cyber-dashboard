@@ -1,7 +1,7 @@
 import { supabase } from './supabase';
 
 // Table names map to our data keys
-type TableName = 'engagements' | 'connections' | 'tasks' | 'deliverables' | 'cpd' | 'events';
+type TableName = 'engagements' | 'connections' | 'tasks' | 'deliverables' | 'cpd' | 'events' | 'leave_balances' | 'leave_records';
 
 export async function loadData<T>(table: TableName, fallback: T[]): Promise<T[]> {
   const { data, error } = await supabase

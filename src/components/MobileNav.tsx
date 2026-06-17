@@ -10,6 +10,7 @@ const navItems = [
   { href: '/connections', label: 'Connections' },
   { href: '/cpd', label: 'CPD' },
   { href: '/calendar', label: 'Calendar' },
+  { href: '/leave', label: 'Leave' },
 ];
 
 export default function MobileNav() {

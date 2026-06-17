@@ -9,10 +9,10 @@ const navItems = [
   { href: '/engagements', label: 'Engagements', icon: '◈' },
   { href: '/tasks', label: 'Tasks', icon: '☑' },
   { href: '/deliverables', label: 'Deliverables', icon: '◻' },
-  { href: '/connections', label: 'Connections', icon: '◎' },
-  { href: '/cpd', label: 'CPD log', icon: '◇' },
   { href: '/calendar', label: 'Calendar', icon: '◫' },
   { href: '/leave', label: 'Leave', icon: '◑' },
+  { href: '/connections', label: 'Connections', icon: '◎' },
+  { href: '/cpd', label: 'CPD log', icon: '◇' },
 ];
 
 export default function Sidebar() {

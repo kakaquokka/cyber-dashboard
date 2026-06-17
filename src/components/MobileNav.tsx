@@ -7,10 +7,10 @@ const navItems = [
   { href: '/engagements', label: 'Engagements' },
   { href: '/tasks', label: 'Tasks' },
   { href: '/deliverables', label: 'Deliverables' },
-  { href: '/connections', label: 'Connections' },
-  { href: '/cpd', label: 'CPD' },
   { href: '/calendar', label: 'Calendar' },
   { href: '/leave', label: 'Leave' },
+  { href: '/connections', label: 'Connections' },
+  { href: '/cpd', label: 'CPD' },
 ];
 
 export default function MobileNav() {

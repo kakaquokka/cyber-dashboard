@@ -177,34 +177,60 @@ export default function OverviewPage() {
       })()}
 
       {/* Mini two-week calendar */}
-      <div className="bg-white border border-gray-100 rounded-xl p-4 mb-6">
-        <div className="flex items-center justify-between mb-3">
-          <button onClick={() => setMiniCalOffset(o => o - 14)} className="text-gray-400 hover:text-gray-700 px-2 py-1 rounded hover:bg-gray-100 transition-colors">‹</button>
-          <h2 className="text-sm font-medium text-gray-500">
-            {format(new Date(Date.now() + miniCalOffset * 86400000), 'd MMM')} – {format(new Date(Date.now() + (miniCalOffset + 13) * 86400000), 'd MMM')}
-          </h2>
-          <button onClick={() => setMiniCalOffset(o => o + 14)} className="text-gray-400 hover:text-gray-700 px-2 py-1 rounded hover:bg-gray-100 transition-colors">›</button>
-        </div>
-        <div className="grid grid-cols-7 gap-1">
-          {Array.from({ length: 14 }).map((_, i) => {
-            const day = new Date(Date.now() + (miniCalOffset + i) * 86400000);
-            const dateStr = format(day, 'yyyy-MM-dd');
-            const dayEvents = calEvents.filter(e => e.date === dateStr);
-            const dayDels = deliverables.filter(d => !d.done && d.dueDate === dateStr);
-            const today = isToday(day);
-            return (
-              <a key={i} href="/calendar" className={`flex flex-col items-center py-2 rounded-lg transition-colors ${today ? 'bg-blue-50' : 'hover:bg-gray-50'}`}>
-                <span className="text-[10px] text-gray-400">{format(day, 'EEE')}</span>
-                <span className={`text-sm font-medium mt-0.5 ${today ? 'text-blue-600' : 'text-gray-700'}`}>{format(day, 'd')}</span>
-                <div className="flex gap-0.5 mt-1 h-1.5">
-                  {dayEvents.length > 0 && <span className="w-1.5 h-1.5 rounded-full bg-blue-400" />}
-                  {dayDels.length > 0 && <span className="w-1.5 h-1.5 rounded-full bg-red-400" />}
-                </div>
-              </a>
-            );
-          })}
-        </div>
-      </div>
+      {(() => {
+        // Anchor to the most recent Sunday so grid always starts on Sun
+        const today = new Date();
+        today.setHours(0, 0, 0, 0);
+        const dayOfWeek = today.getDay(); // 0=Sun
+        const thisSunday = new Date(today);
+        thisSunday.setDate(today.getDate() - dayOfWeek);
+
+        // weekOffset moves in 7-day increments from that Sunday
+        const startDay = new Date(thisSunday);
+        startDay.setDate(thisSunday.getDate() + miniCalOffset);
+
+        const endDay = new Date(startDay);
+        endDay.setDate(startDay.getDate() + 13);
+
+        return (
+          <div className="bg-white border border-gray-100 rounded-xl p-4 mb-6">
+            <div className="flex items-center justify-between mb-3">
+              <button onClick={() => setMiniCalOffset(o => o - 14)} className="text-gray-400 hover:text-gray-700 px-2 py-1 rounded hover:bg-gray-100 transition-colors">‹</button>
+              <h2 className="text-sm font-medium text-gray-500">
+                {format(startDay, 'd MMM')} – {format(endDay, 'd MMM')}
+              </h2>
+              <button onClick={() => setMiniCalOffset(o => o + 14)} className="text-gray-400 hover:text-gray-700 px-2 py-1 rounded hover:bg-gray-100 transition-colors">›</button>
+            </div>
+            {/* Day headers — always Sun to Sat */}
+            <div className="grid grid-cols-7 gap-1 mb-1">
+              {['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'].map(d => (
+                <div key={d} className="text-center text-[10px] text-gray-300 font-medium">{d}</div>
+              ))}
+            </div>
+            <div className="grid grid-cols-7 gap-1">
+              {Array.from({ length: 14 }).map((_, i) => {
+                const day = new Date(startDay);
+                day.setDate(startDay.getDate() + i);
+                const dateStr = format(day, 'yyyy-MM-dd');
+                const dayEvts = calEvents.filter(e => e.date === dateStr);
+                const dayDels = deliverables.filter(d => !d.done && d.dueDate === dateStr);
+                const dayLeave = leaveRecords ? leaveRecords.filter(r => r.startDate <= dateStr && r.endDate >= dateStr) : [];
+                const todayFlag = isToday(day);
+                return (
+                  <a key={i} href="/calendar" className={`flex flex-col items-center py-2 rounded-lg transition-colors ${todayFlag ? 'bg-blue-50' : 'hover:bg-gray-50'}`}>
+                    <span className={`text-sm font-medium ${todayFlag ? 'text-blue-600' : 'text-gray-700'}`}>{format(day, 'd')}</span>
+                    <div className="flex gap-0.5 mt-1 h-1.5">
+                      {dayEvts.length > 0 && <span className="w-1.5 h-1.5 rounded-full bg-blue-400" />}
+                      {dayDels.length > 0 && <span className="w-1.5 h-1.5 rounded-full bg-red-400" />}
+                      {dayLeave.length > 0 && <span className="w-1.5 h-1.5 rounded-full bg-green-400" />}
+                    </div>
+                  </a>
+                );
+              })}
+            </div>
+          </div>
+        );
+      })()}
 
       {/* Metric cards */}
       <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">

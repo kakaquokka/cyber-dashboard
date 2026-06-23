@@ -232,6 +232,13 @@ export default function OverviewPage() {
         );
       })()}
 
+      {/* Legend */}
+      <div className="flex gap-4 mb-4 text-xs text-gray-400">
+        <span className="flex items-center gap-1.5"><span className="w-2 h-2 rounded-full bg-blue-400 inline-block" />Meeting / event</span>
+        <span className="flex items-center gap-1.5"><span className="w-2 h-2 rounded-full bg-red-400 inline-block" />Deliverable due</span>
+        <span className="flex items-center gap-1.5"><span className="w-2 h-2 rounded-full bg-green-400 inline-block" />Leave</span>
+      </div>
+
       {/* Metric cards */}
       <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
         {[

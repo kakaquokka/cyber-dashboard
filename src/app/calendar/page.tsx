@@ -1,6 +1,8 @@
 'use client';
 
 import { useEffect, useState } from 'react';
+import { Suspense } from 'react';
+import { useSearchParams } from 'next/navigation';
 import { loadData, saveData, deleteRow, saveItem } from '@/lib/storage';
 import { CalendarEvent, Engagement, Deliverable, MeetingApp, MeetingMode } from '@/lib/types';
 import { seedEvents, seedEngagements, seedDeliverables } from '@/lib/seeds';
@@ -23,12 +25,18 @@ const emptyForm: Omit<CalendarEvent, 'id'> = {
   meetingApp: 'Teams', meetingLink: '', location: '', notes: '', engagementId: '',
 };
 
-export default function CalendarPage() {
+function CalendarContent() {
   const [calEvents, setCalEvents] = useState<CalendarEvent[]>([]);
   const [deliverables, setDeliverables] = useState<Deliverable[]>([]);
   const [engagements, setEngagements] = useState<Engagement[]>([]);
-  const [currentMonth, setCurrentMonth] = useState(new Date());
-  const [selectedDay, setSelectedDay] = useState<Date | null>(new Date());
+  const searchParams = useSearchParams();
+  const initialDate = searchParams.get('date');
+  const [currentMonth, setCurrentMonth] = useState(
+    initialDate ? new Date(initialDate) : new Date()
+  );
+  const [selectedDay, setSelectedDay] = useState<Date | null>(
+    initialDate ? new Date(initialDate) : new Date()
+  );
   const [showModal, setShowModal] = useState(false);
   const [showDetail, setShowDetail] = useState<CalendarEvent | null>(null);
   const [editingEvent, setEditingEvent] = useState<CalendarEvent | null>(null);
@@ -502,5 +510,13 @@ export default function CalendarPage() {
         </div>
         )}
     </div>
+  );
+}
+
+export default function CalendarPage() {
+  return (
+    <Suspense fallback={null}>
+      <CalendarContent />
+    </Suspense>
   );
 }

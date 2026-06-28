@@ -252,7 +252,7 @@ export default function OverviewPage() {
                         <div className="bg-gray-900 text-white rounded-xl p-3 shadow-xl text-xs">
                           <div className="font-medium text-gray-300 mb-2">{format(day, 'EEE, d MMM')}</div>
                           {dayEvts.map(e => (
-                            <a key={e.id} href="/calendar" className="flex items-start gap-1.5 mb-1.5 hover:opacity-70 transition-opacity pointer-events-auto">
+                            <a key={e.id} href={`/calendar?date=${e.date}`} className="flex items-start gap-1.5 mb-1.5 hover:opacity-70 transition-opacity pointer-events-auto">
                               <span className="w-1.5 h-1.5 rounded-full bg-blue-400 shrink-0 mt-1" />
                               <div>
                                 <div className="text-white">{e.title}</div>
@@ -316,7 +316,7 @@ export default function OverviewPage() {
               </div>
               <div className="space-y-3">
                 {dayEvts.map(e => (
-                  <a key={e.id} href="/calendar" className="flex items-start gap-3 hover:bg-gray-50 rounded-lg p-1 -mx-1 transition-colors">
+                  <a key={e.id} href={`/calendar?date=${dateStr}`} className="flex items-start gap-3 hover:bg-gray-50 rounded-lg p-1 -mx-1 transition-colors">
                     <span className="w-2 h-2 rounded-full bg-blue-400 shrink-0 mt-1" />
                     <div>
                       <div className="text-sm font-medium text-gray-800">{e.title}</div>

@@ -27,18 +27,6 @@ function dueDateColor(dateStr: string): string {
   return 'text-gray-400';
 }
 
-function initials(name: string) {
-  return name.split(' ').map(n => n[0]).join('').slice(0, 2).toUpperCase();
-}
-
-const avatarColors = [
-  'bg-blue-100 text-blue-800',
-  'bg-green-100 text-green-800',
-  'bg-purple-100 text-purple-800',
-  'bg-amber-100 text-amber-800',
-  'bg-pink-100 text-pink-800',
-];
-
 export default function OverviewPage() {
   const [miniCalOffset, setMiniCalOffset] = useState(0);
   const [miniCalPopup, setMiniCalPopup] = useState<{ dateStr: string; x: number; y: number } | null>(null);
@@ -65,7 +53,7 @@ export default function OverviewPage() {
   });
   const doneDeliverables = deliverables.filter(d => d.done).length;
   const upcomingDeadlines = engagements
-    .filter(e => e.phase !== 'closed' && differenceInDays(new Date(e.deadline), new Date()) <= 7)
+    .filter(e => e.phase !== 'closed' && e.phase !== 'partnership' && e.deadline && differenceInDays(new Date(e.deadline), new Date()) <= 7)
     .length;
 
   function formatDateInput(value: string): string {
@@ -420,7 +408,7 @@ export default function OverviewPage() {
                 <div className="flex items-center justify-between mb-1">
                   <span className="text-sm text-gray-800">{eng.clientName}</span>
                   <div className="flex items-center gap-2">
-                    <span className="text-xs text-gray-400">{dueDateLabel(eng.deadline)}</span>
+                    {eng.deadline && <span className="text-xs text-gray-400">{dueDateLabel(eng.deadline)}</span>}
                     <span className="text-xs font-medium text-gray-600">{eng.progress}%</span>
                   </div>
                 </div>

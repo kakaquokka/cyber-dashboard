@@ -87,12 +87,6 @@ export default function OverviewPage() {
     setTaskForm({ title: '', priority: 'medium', dueDate: '', engagementId: '' });
   }
 
-  if (typeof window !== 'undefined') {
-    window.onerror = (msg, src, line, col, err) => {
-      document.body.innerHTML = `<div style="padding:20px;font-family:sans-serif"><h2>Error</h2><pre style="white-space:pre-wrap;font-size:12px">${msg}\n${src}:${line}:${col}\n${err?.stack || ''}</pre></div>`;
-      return true;
-    };
-  }
 
   return (
     <div className="p-4 md:p-8 max-w-6xl pb-24">
@@ -254,38 +248,38 @@ export default function OverviewPage() {
 
                     {/* Desktop hover tooltip */}
                     {hasItems && (
-                      <div className="hidden md:block absolute z-50 bottom-full left-1/2 -translate-x-1/2 mb-2 w-52 pointer-events-none opacity-0 group-hover:opacity-100 transition-opacity duration-150">
+                      <div className="hidden md:block absolute z-50 bottom-full left-1/2 -translate-x-1/2 mb-2 w-52 pointer-events-auto opacity-0 group-hover:opacity-100 transition-opacity duration-150">
                         <div className="bg-gray-900 text-white rounded-xl p-3 shadow-xl text-xs">
                           <div className="font-medium text-gray-300 mb-2">{format(day, 'EEE, d MMM')}</div>
                           {dayEvts.map(e => (
-                            <div key={e.id} className="flex items-start gap-1.5 mb-1.5">
+                            <a key={e.id} href="/calendar" className="flex items-start gap-1.5 mb-1.5 hover:opacity-70 transition-opacity pointer-events-auto">
                               <span className="w-1.5 h-1.5 rounded-full bg-blue-400 shrink-0 mt-1" />
                               <div>
                                 <div className="text-white">{e.title}</div>
                                 <div className="text-gray-400">{e.time}{e.endTime ? ` – ${e.endTime}` : ''} · {e.mode === 'online' ? e.meetingApp : e.location}</div>
                               </div>
-                            </div>
+                            </a>
                           ))}
                           {dayDels.map(d => {
                             const eng = engagements.find(en => en.id === d.engagementId);
                             return (
-                              <div key={d.id} className="flex items-start gap-1.5 mb-1.5">
+                              <a key={d.id} href="/deliverables" className="flex items-start gap-1.5 mb-1.5 hover:opacity-70 transition-opacity pointer-events-auto">
                                 <span className="w-1.5 h-1.5 rounded-full bg-red-400 shrink-0 mt-1" />
                                 <div>
                                   <div className="text-white">{d.title}</div>
                                   {eng && <div className="text-gray-400">{eng.clientName}</div>}
                                 </div>
-                              </div>
+                              </a>
                             );
                           })}
-                          {dayLeave.map(r => (
-                            <div key={r.id} className="flex items-start gap-1.5 mb-1.5">
+                          {dayLeave.filter(r => r.startDate?.length === 10).map(r => (
+                            <a key={r.id} href="/leave" className="flex items-start gap-1.5 mb-1.5 hover:opacity-70 transition-opacity pointer-events-auto">
                               <span className="w-1.5 h-1.5 rounded-full bg-green-400 shrink-0 mt-1" />
                               <div>
                                 <div className="text-white">{r.type} leave · {r.days} day{r.days !== 1 ? 's' : ''}</div>
                                 {r.notes && <div className="text-gray-400">{r.notes}</div>}
                               </div>
-                            </div>
+                            </a>
                           ))}
                           {/* Tooltip arrow */}
                           <div className="absolute top-full left-1/2 -translate-x-1/2 w-0 h-0 border-l-4 border-r-4 border-t-4 border-l-transparent border-r-transparent border-t-gray-900" />
@@ -322,34 +316,34 @@ export default function OverviewPage() {
               </div>
               <div className="space-y-3">
                 {dayEvts.map(e => (
-                  <div key={e.id} className="flex items-start gap-3">
+                  <a key={e.id} href="/calendar" className="flex items-start gap-3 hover:bg-gray-50 rounded-lg p-1 -mx-1 transition-colors">
                     <span className="w-2 h-2 rounded-full bg-blue-400 shrink-0 mt-1" />
                     <div>
                       <div className="text-sm font-medium text-gray-800">{e.title}</div>
                       <div className="text-xs text-gray-400 mt-0.5">{e.time}{e.endTime ? ` – ${e.endTime}` : ''} · {e.mode === 'online' ? e.meetingApp : e.location}</div>
                     </div>
-                  </div>
+                  </a>
                 ))}
                 {dayDels.map(d => {
                   const eng = engagements.find(en => en.id === d.engagementId);
                   return (
-                    <div key={d.id} className="flex items-start gap-3">
+                    <a key={d.id} href="/deliverables" className="flex items-start gap-3 hover:bg-gray-50 rounded-lg p-1 -mx-1 transition-colors">
                       <span className="w-2 h-2 rounded-full bg-red-400 shrink-0 mt-1" />
                       <div>
                         <div className="text-sm font-medium text-gray-800">{d.title}</div>
                         {eng && <div className="text-xs text-gray-400 mt-0.5">Due · {eng.clientName}</div>}
                       </div>
-                    </div>
+                    </a>
                   );
                 })}
                 {dayLeave.filter(r => r.startDate?.length === 10).map(r => (
-                  <div key={r.id} className="flex items-start gap-3">
+                  <a key={r.id} href="/leave" className="flex items-start gap-3 hover:bg-gray-50 rounded-lg p-1 -mx-1 transition-colors">
                     <span className="w-2 h-2 rounded-full bg-green-400 shrink-0 mt-1" />
                     <div>
                       <div className="text-sm font-medium text-gray-800">{r.type} leave · {r.days} day{r.days !== 1 ? 's' : ''}</div>
                       {r.notes && <div className="text-xs text-gray-400 mt-0.5">{r.notes}</div>}
                     </div>
-                  </div>
+                  </a>
                 ))}
               </div>
             </div>

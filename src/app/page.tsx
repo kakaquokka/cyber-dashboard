@@ -41,6 +41,7 @@ const avatarColors = [
 
 export default function OverviewPage() {
   const [miniCalOffset, setMiniCalOffset] = useState(0);
+  const [miniCalPopup, setMiniCalPopup] = useState<{ dateStr: string; x: number; y: number } | null>(null);
   const [engagements, setEngagements] = useState<Engagement[]>([]);
   const [tasks, setTasks] = useState<Task[]>([]);
   const [deliverables, setDeliverables] = useState<Deliverable[]>([]);
@@ -178,17 +179,13 @@ export default function OverviewPage() {
 
       {/* Mini two-week calendar */}
       {(() => {
-        // Anchor to the most recent Sunday so grid always starts on Sun
         const today = new Date();
         today.setHours(0, 0, 0, 0);
-        const dayOfWeek = today.getDay(); // 0=Sun
+        const dayOfWeek = today.getDay();
         const thisSunday = new Date(today);
         thisSunday.setDate(today.getDate() - dayOfWeek);
-
-        // weekOffset moves in 7-day increments from that Sunday
         const startDay = new Date(thisSunday);
         startDay.setDate(thisSunday.getDate() + miniCalOffset);
-
         const endDay = new Date(startDay);
         endDay.setDate(startDay.getDate() + 13);
 
@@ -201,7 +198,6 @@ export default function OverviewPage() {
               </h2>
               <button onClick={() => setMiniCalOffset(o => o + 14)} className="text-gray-400 hover:text-gray-700 px-2 py-1 rounded hover:bg-gray-100 transition-colors">›</button>
             </div>
-            {/* Day headers — always Sun to Sat */}
             <div className="grid grid-cols-7 gap-1 mb-1">
               {['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'].map(d => (
                 <div key={d} className="text-center text-[10px] text-gray-300 font-medium">{d}</div>
@@ -215,18 +211,135 @@ export default function OverviewPage() {
                 const dayEvts = calEvents.filter(e => e.date === dateStr);
                 const dayDels = deliverables.filter(d => !d.done && d.dueDate === dateStr);
                 const dayLeave = leaveRecords ? leaveRecords.filter(r => r.startDate <= dateStr && r.endDate >= dateStr) : [];
+                const hasItems = dayEvts.length > 0 || dayDels.length > 0 || dayLeave.length > 0;
                 const todayFlag = isToday(day);
+
                 return (
-                  <a key={i} href="/calendar" className={`flex flex-col items-center py-2 rounded-lg transition-colors ${todayFlag ? 'bg-blue-50' : 'hover:bg-gray-50'}`}>
-                    <span className={`text-sm font-medium ${todayFlag ? 'text-blue-600' : 'text-gray-700'}`}>{format(day, 'd')}</span>
-                    <div className="flex gap-0.5 mt-1 h-1.5">
-                      {dayEvts.length > 0 && <span className="w-1.5 h-1.5 rounded-full bg-blue-400" />}
-                      {dayDels.length > 0 && <span className="w-1.5 h-1.5 rounded-full bg-red-400" />}
-                      {dayLeave.length > 0 && <span className="w-1.5 h-1.5 rounded-full bg-green-400" />}
+                  <div key={i} className="relative group">
+                    {/* The day cell */}
+                    <div
+                      onClick={() => {
+                        if (!hasItems) return;
+                        setMiniCalPopup(prev =>
+                          prev?.dateStr === dateStr ? null : { dateStr, x: 0, y: 0 }
+                        );
+                      }}
+                      className={`flex flex-col items-center py-2 rounded-lg transition-colors select-none
+                        ${todayFlag ? 'bg-blue-50' : ''}
+                        ${hasItems ? 'md:cursor-default cursor-pointer hover:bg-gray-50' : 'cursor-default'}
+                      `}
+                    >
+                      <span className={`text-sm font-medium ${todayFlag ? 'text-blue-600' : 'text-gray-700'}`}>
+                        {format(day, 'd')}
+                      </span>
+                      <div className="flex gap-0.5 mt-1 h-1.5">
+                        {dayEvts.length > 0 && <span className="w-1.5 h-1.5 rounded-full bg-blue-400" />}
+                        {dayDels.length > 0 && <span className="w-1.5 h-1.5 rounded-full bg-red-400" />}
+                        {dayLeave.length > 0 && <span className="w-1.5 h-1.5 rounded-full bg-green-400" />}
+                      </div>
                     </div>
-                  </a>
+
+                    {/* Desktop hover tooltip */}
+                    {hasItems && (
+                      <div className="hidden md:block absolute z-50 bottom-full left-1/2 -translate-x-1/2 mb-2 w-52 pointer-events-none opacity-0 group-hover:opacity-100 transition-opacity duration-150">
+                        <div className="bg-gray-900 text-white rounded-xl p-3 shadow-xl text-xs">
+                          <div className="font-medium text-gray-300 mb-2">{format(day, 'EEE, d MMM')}</div>
+                          {dayEvts.map(e => (
+                            <div key={e.id} className="flex items-start gap-1.5 mb-1.5">
+                              <span className="w-1.5 h-1.5 rounded-full bg-blue-400 shrink-0 mt-1" />
+                              <div>
+                                <div className="text-white">{e.title}</div>
+                                <div className="text-gray-400">{e.time}{e.endTime ? ` – ${e.endTime}` : ''} · {e.mode === 'online' ? e.meetingApp : e.location}</div>
+                              </div>
+                            </div>
+                          ))}
+                          {dayDels.map(d => {
+                            const eng = engagements.find(en => en.id === d.engagementId);
+                            return (
+                              <div key={d.id} className="flex items-start gap-1.5 mb-1.5">
+                                <span className="w-1.5 h-1.5 rounded-full bg-red-400 shrink-0 mt-1" />
+                                <div>
+                                  <div className="text-white">{d.title}</div>
+                                  {eng && <div className="text-gray-400">{eng.clientName}</div>}
+                                </div>
+                              </div>
+                            );
+                          })}
+                          {dayLeave.map(r => (
+                            <div key={r.id} className="flex items-start gap-1.5 mb-1.5">
+                              <span className="w-1.5 h-1.5 rounded-full bg-green-400 shrink-0 mt-1" />
+                              <div>
+                                <div className="text-white">{r.type} leave · {r.days} day{r.days !== 1 ? 's' : ''}</div>
+                                {r.notes && <div className="text-gray-400">{r.notes}</div>}
+                              </div>
+                            </div>
+                          ))}
+                          {/* Tooltip arrow */}
+                          <div className="absolute top-full left-1/2 -translate-x-1/2 w-0 h-0 border-l-4 border-r-4 border-t-4 border-l-transparent border-r-transparent border-t-gray-900" />
+                        </div>
+                      </div>
+                    )}
+                  </div>
                 );
               })}
+            </div>
+
+            {/* Legend */}
+            <div className="flex gap-4 mt-3 pt-3 border-t border-gray-50">
+              <span className="flex items-center gap-1.5 text-xs text-gray-400"><span className="w-2 h-2 rounded-full bg-blue-400 inline-block" />Event</span>
+              <span className="flex items-center gap-1.5 text-xs text-gray-400"><span className="w-2 h-2 rounded-full bg-red-400 inline-block" />Deliverable</span>
+              <span className="flex items-center gap-1.5 text-xs text-gray-400"><span className="w-2 h-2 rounded-full bg-green-400 inline-block" />Leave</span>
+            </div>
+          </div>
+        );
+      })()}
+
+      {/* Mobile popup for mini calendar */}
+      {miniCalPopup && (() => {
+        const { dateStr } = miniCalPopup;
+        const day = new Date(dateStr);
+        const dayEvts = calEvents.filter(e => e.date === dateStr);
+        const dayDels = deliverables.filter(d => !d.done && d.dueDate === dateStr);
+        const dayLeave = leaveRecords ? leaveRecords.filter(r => r.startDate <= dateStr && r.endDate >= dateStr) : [];
+        return (
+          <div className="md:hidden fixed inset-0 bg-black/40 flex items-end justify-center z-50" onClick={() => setMiniCalPopup(null)}>
+            <div className="bg-white rounded-t-2xl p-5 w-full shadow-xl max-h-[60vh] overflow-y-auto" onClick={e => e.stopPropagation()}>
+              <div className="flex items-center justify-between mb-4">
+                <h2 className="text-sm font-semibold text-gray-900">{format(day, 'EEEE, d MMMM yyyy')}</h2>
+                <button onClick={() => setMiniCalPopup(null)} className="text-gray-400 hover:text-gray-600">✕</button>
+              </div>
+              <div className="space-y-3">
+                {dayEvts.map(e => (
+                  <div key={e.id} className="flex items-start gap-3">
+                    <span className="w-2 h-2 rounded-full bg-blue-400 shrink-0 mt-1" />
+                    <div>
+                      <div className="text-sm font-medium text-gray-800">{e.title}</div>
+                      <div className="text-xs text-gray-400 mt-0.5">{e.time}{e.endTime ? ` – ${e.endTime}` : ''} · {e.mode === 'online' ? e.meetingApp : e.location}</div>
+                    </div>
+                  </div>
+                ))}
+                {dayDels.map(d => {
+                  const eng = engagements.find(en => en.id === d.engagementId);
+                  return (
+                    <div key={d.id} className="flex items-start gap-3">
+                      <span className="w-2 h-2 rounded-full bg-red-400 shrink-0 mt-1" />
+                      <div>
+                        <div className="text-sm font-medium text-gray-800">{d.title}</div>
+                        {eng && <div className="text-xs text-gray-400 mt-0.5">Due · {eng.clientName}</div>}
+                      </div>
+                    </div>
+                  );
+                })}
+                {dayLeave.map(r => (
+                  <div key={r.id} className="flex items-start gap-3">
+                    <span className="w-2 h-2 rounded-full bg-green-400 shrink-0 mt-1" />
+                    <div>
+                      <div className="text-sm font-medium text-gray-800">{r.type} leave · {r.days} day{r.days !== 1 ? 's' : ''}</div>
+                      {r.notes && <div className="text-xs text-gray-400 mt-0.5">{r.notes}</div>}
+                    </div>
+                  </div>
+                ))}
+              </div>
             </div>
           </div>
         );

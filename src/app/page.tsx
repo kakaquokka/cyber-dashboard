@@ -109,8 +109,13 @@ export default function OverviewPage() {
         const upcomingDels = deliverables
           .filter(d => !d.done && d.dueDate >= todayStr && new Date(d.dueDate) <= in7)
           .sort((a, b) => a.dueDate.localeCompare(b.dueDate));
-        const upcomingLeave = leaveRecords
-          .filter(r => r.endDate >= todayStr && new Date(r.startDate) <= in7)
+        const upcomingLeave = (leaveRecords || [])
+          .filter(r => {
+            try {
+              return r.startDate?.length === 10 && r.endDate?.length === 10 &&
+                r.endDate >= todayStr && new Date(r.startDate) <= in7;
+            } catch { return false; }
+          })
           .sort((a, b) => a.startDate.localeCompare(b.startDate));
 
         if (upcoming.length === 0 && upcomingDels.length === 0 && upcomingLeave.length === 0) return null;
@@ -146,7 +151,7 @@ export default function OverviewPage() {
                   </div>
                 );
               })}
-              {upcomingLeave.map(r => (
+              {upcomingLeave.filter(r => r.startDate?.length === 10 && r.endDate?.length === 10).map(r => (
                 <div key={r.id} className="flex items-center gap-3 py-1">
                   <span className="w-2 h-2 rounded-full bg-green-400 shrink-0" />
                   <div className="flex-1 min-w-0">
@@ -198,7 +203,12 @@ export default function OverviewPage() {
                 const dateStr = format(day, 'yyyy-MM-dd');
                 const dayEvts = calEvents.filter(e => e.date === dateStr);
                 const dayDels = deliverables.filter(d => !d.done && d.dueDate === dateStr);
-                const dayLeave = leaveRecords ? leaveRecords.filter(r => r.startDate <= dateStr && r.endDate >= dateStr) : [];
+                const dayLeave = (leaveRecords || []).filter(r => {
+                  try {
+                    return r.startDate?.length === 10 && r.endDate?.length === 10 &&
+                      r.startDate <= dateStr && r.endDate >= dateStr;
+                  } catch { return false; }
+                });
                 const hasItems = dayEvts.length > 0 || dayDels.length > 0 || dayLeave.length > 0;
                 const todayFlag = isToday(day);
 
@@ -288,7 +298,12 @@ export default function OverviewPage() {
         const day = new Date(dateStr);
         const dayEvts = calEvents.filter(e => e.date === dateStr);
         const dayDels = deliverables.filter(d => !d.done && d.dueDate === dateStr);
-        const dayLeave = leaveRecords ? leaveRecords.filter(r => r.startDate <= dateStr && r.endDate >= dateStr) : [];
+        const dayLeave = (leaveRecords || []).filter(r => {
+                  try {
+                    return r.startDate?.length === 10 && r.endDate?.length === 10 &&
+                      r.startDate <= dateStr && r.endDate >= dateStr;
+                  } catch { return false; }
+                });
         return (
           <div className="md:hidden fixed inset-0 bg-black/40 flex items-end justify-center z-50" onClick={() => setMiniCalPopup(null)}>
             <div className="bg-white rounded-t-2xl p-5 w-full shadow-xl max-h-[60vh] overflow-y-auto" onClick={e => e.stopPropagation()}>
@@ -318,7 +333,7 @@ export default function OverviewPage() {
                     </div>
                   );
                 })}
-                {dayLeave.map(r => (
+                {dayLeave.filter(r => r.startDate?.length === 10).map(r => (
                   <div key={r.id} className="flex items-start gap-3">
                     <span className="w-2 h-2 rounded-full bg-green-400 shrink-0 mt-1" />
                     <div>

@@ -79,6 +79,13 @@ export default function OverviewPage() {
     setTaskForm({ title: '', priority: 'medium', dueDate: '', engagementId: '' });
   }
 
+  if (typeof window !== 'undefined') {
+    window.onerror = (msg, src, line, col, err) => {
+      document.body.innerHTML = `<div style="padding:20px;font-family:sans-serif"><h2>Error</h2><pre style="white-space:pre-wrap;font-size:12px">${msg}\n${src}:${line}:${col}\n${err?.stack || ''}</pre></div>`;
+      return true;
+    };
+  }
+
   return (
     <div className="p-4 md:p-8 max-w-6xl pb-24">
       {/* Header */}
@@ -282,12 +289,6 @@ export default function OverviewPage() {
               })}
             </div>
 
-            {/* Legend */}
-            <div className="flex gap-4 mt-3 pt-3 border-t border-gray-50">
-              <span className="flex items-center gap-1.5 text-xs text-gray-400"><span className="w-2 h-2 rounded-full bg-blue-400 inline-block" />Event</span>
-              <span className="flex items-center gap-1.5 text-xs text-gray-400"><span className="w-2 h-2 rounded-full bg-red-400 inline-block" />Deliverable</span>
-              <span className="flex items-center gap-1.5 text-xs text-gray-400"><span className="w-2 h-2 rounded-full bg-green-400 inline-block" />Leave</span>
-            </div>
           </div>
         );
       })()}

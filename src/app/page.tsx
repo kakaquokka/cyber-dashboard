@@ -12,19 +12,27 @@ import { LeaveRecord } from '@/lib/types';
 import { seedLeaveRecords } from '@/lib/seeds';
 
 function dueDateLabel(dateStr: string): string {
-  const d = new Date(dateStr);
-  if (isToday(d)) return 'Today';
-  if (isTomorrow(d)) return 'Tomorrow';
-  const diff = differenceInDays(d, new Date());
-  if (diff < 0) return 'Overdue';
-  return format(d, 'd MMM');
+  if (!dateStr || dateStr.length < 10) return '';
+  try {
+    const d = new Date(dateStr);
+    if (isNaN(d.getTime())) return '';
+    if (isToday(d)) return 'Today';
+    if (isTomorrow(d)) return 'Tomorrow';
+    const diff = differenceInDays(d, new Date());
+    if (diff < 0) return 'Overdue';
+    return format(d, 'd MMM');
+  } catch { return ''; }
 }
 
 function dueDateColor(dateStr: string): string {
-  const d = new Date(dateStr);
-  if (isToday(d) || differenceInDays(d, new Date()) < 0) return 'text-red-600';
-  if (differenceInDays(d, new Date()) <= 2) return 'text-amber-600';
-  return 'text-gray-400';
+  if (!dateStr || dateStr.length < 10) return 'text-gray-400';
+  try {
+    const d = new Date(dateStr);
+    if (isNaN(d.getTime())) return 'text-gray-400';
+    if (isToday(d) || differenceInDays(d, new Date()) < 0) return 'text-red-600';
+    if (differenceInDays(d, new Date()) <= 2) return 'text-amber-600';
+    return 'text-gray-400';
+  } catch { return 'text-gray-400'; }
 }
 
 export default function OverviewPage() {

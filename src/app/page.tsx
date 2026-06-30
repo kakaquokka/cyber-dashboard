@@ -248,8 +248,8 @@ export default function OverviewPage() {
 
                     {/* Desktop hover tooltip */}
                     {hasItems && (
-                      <div className="hidden md:block absolute z-50 bottom-full left-1/2 -translate-x-1/2 mb-2 w-52 pointer-events-auto opacity-0 group-hover:opacity-100 transition-opacity duration-150">
-                        <div className="bg-gray-900 text-white rounded-xl p-3 shadow-xl text-xs">
+                      <div className={`hidden md:block absolute z-50 w-52 pointer-events-auto opacity-0 group-hover:opacity-100 transition-opacity duration-150 left-1/2 -translate-x-1/2 ${i < 7 ? 'bottom-full mb-2' : 'top-full mt-2'}`}>
+                        <div className="bg-gray-900 text-white rounded-xl p-3 shadow-xl text-xs relative">
                           <div className="font-medium text-gray-300 mb-2">{format(day, 'EEE, d MMM')}</div>
                           {dayEvts.map(e => (
                             <a key={e.id} href={`/calendar?date=${e.date}`} className="flex items-start gap-1.5 mb-1.5 hover:opacity-70 transition-opacity pointer-events-auto">
@@ -281,8 +281,12 @@ export default function OverviewPage() {
                               </div>
                             </a>
                           ))}
-                          {/* Tooltip arrow */}
-                          <div className="absolute top-full left-1/2 -translate-x-1/2 w-0 h-0 border-l-4 border-r-4 border-t-4 border-l-transparent border-r-transparent border-t-gray-900" />
+                          {/* Arrow — points down for row 1 (above), points up for row 2 (below) */}
+                          {i < 7 ? (
+                            <div className="absolute top-full left-1/2 -translate-x-1/2 w-0 h-0 border-l-4 border-r-4 border-t-4 border-l-transparent border-r-transparent border-t-gray-900" />
+                          ) : (
+                            <div className="absolute bottom-full left-1/2 -translate-x-1/2 w-0 h-0 border-l-4 border-r-4 border-b-4 border-l-transparent border-r-transparent border-b-gray-900" />
+                          )}
                         </div>
                       </div>
                     )}
